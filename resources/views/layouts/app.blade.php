@@ -303,6 +303,12 @@
 </head>
 
 <body class="antialiased">
+    <div class="gtranslate_wrapper"></div>
+    <script>
+        window.gtranslateSettings = {"default_language":"en","detect_browser_language":true,"wrapper_selector":".gtranslate_wrapper","switcher_horizontal_position":"right","switcher_vertical_position":"top","alt_flags":{"en":"usa","pt":"brazil","es":"colombia","fr":"quebec"}}
+    </script>
+    <script src="https://cdn.gtranslate.net/widgets/latest/float.js" defer></script>
+
     <!-- Navigation -->
     <nav class="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-200 shadow-sm">
         <div class="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -486,10 +492,10 @@
                 <div>
                     <h3 class="text-lg font-semibold text-gray-900 mb-4">Contact Info</h3>
                     <ul class="space-y-2 text-text-secondary">
-                        <li class="flex items-center space-x-2">
+                        {{-- <li class="flex items-center space-x-2">
                             <i data-feather="phone" class="h-4 w-4"></i>
                             <span>+13154893120</span>
-                        </li>
+                        </li> --}}
                         <li class="flex items-center space-x-2">
                             <i data-feather="mail" class="h-4 w-4"></i>
                             <span>info@novexialogistics.com</span>

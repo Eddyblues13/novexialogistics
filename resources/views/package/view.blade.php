@@ -542,8 +542,8 @@
                 <div class="d-flex justify-content-between align-items-center py-3">
                     <div class="d-flex align-items-center">
                         <i class="fas fa-shipping-fast fa-2x text-white me-2"></i>
-                        <a href="{{route('homepage')}}" class="logo"> <img src="./assets/images/logo.png" width="80"
-                                height="50"></a>
+                        <a href="{{route('homepage')}}" class="text-white text-decoration-none fw-bold fs-4">Novexia
+                            Logistics</a>
                     </div>
                     <div>
                         <span class="text-white-50">{{ date('l, F j, Y') }}</span>
@@ -897,7 +897,7 @@
 
                                 <div class="detail-item">
                                     <div class="detail-label">Carrier</div>
-                                    <div>FedEx Express</div>
+                                    <div>Novexia Logistics</div>
                                 </div>
                                 <div class="detail-item">
                                     <div class="detail-label">Service</div>
