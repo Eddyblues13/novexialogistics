@@ -1019,13 +1019,13 @@
             <div class="container">
                 <div class="row">
                     <div class="col-md-6">
-                        <h5>FedEx TrackPro</h5>
+                        <h5>Novexia Logistics</h5>
                         <p>Your trusted partner for fast and reliable shipping solutions worldwide.</p>
                     </div>
                     <div class="col-md-6 text-md-end">
                         <p>Need help? Contact our support team 24/7</p>
-                        <p><i class="fas fa-phone me-2"></i> +1(318) 491-5463</p>
-                        <p><i class="fas fa-envelope me-2"></i> support@expressairdelivery.com</p>
+                        {{-- <p><i class="fas fa-phone me-2"></i> +1(318) 491-5463</p> --}}
+                        <p><i class="fas fa-envelope me-2"></i> support@novexialogistics.com</p>
                     </div>
                 </div>
             </div>
