@@ -185,6 +185,12 @@
                                     <p>Send Email</p>
                                 </a>
                             </li>
+                            <li class="nav-item">
+                                <a href="{{route('admin.compose-email')}}">
+                                    <i class="fas fa-pen-fancy" aria-hidden="true"></i>
+                                    <p>Compose Email</p>
+                                </a>
+                            </li>
                             {{-- <li class="nav-item">
                                 <a href="{{route('admin.packages.show.index')}}">
                                     <i class="fas fa-cubes " aria-hidden="true"></i>

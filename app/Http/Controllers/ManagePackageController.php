@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Package;
+use App\Mail\CustomEmail;
 use App\Mail\ShipmentCreated;
 use Illuminate\Http\Request;
 use App\Models\TrackingLocation;
@@ -490,6 +491,53 @@ class ManagePackageController extends Controller
             return response()->json([
                 'status' => 'error',
                 'message' => 'Error deleting package: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function composeEmail()
+    {
+        return view('admin.package.compose-email');
+    }
+
+    public function sendCustomEmail(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'recipient_email' => 'required|email',
+            'subject' => 'required|string|max:255',
+            'message' => 'required|string',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Validation failed',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        try {
+            Mail::to($request->recipient_email)->send(
+                new CustomEmail($request->subject, $request->message)
+            );
+
+            Log::info('Custom email sent by admin', [
+                'to' => $request->recipient_email,
+                'subject' => $request->subject
+            ]);
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Email sent successfully to ' . $request->recipient_email
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Failed to send custom email: ' . $e->getMessage(), [
+                'to' => $request->recipient_email
+            ]);
+
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to send email: ' . $e->getMessage()
             ], 500);
         }
     }
