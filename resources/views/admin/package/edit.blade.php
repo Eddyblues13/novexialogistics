@@ -286,55 +286,135 @@
                                         </div>
                                     </div>
 
-                                    <!-- Package Image Upload -->
+                                    <!-- Package Media Upload (Image or Video) -->
                                     <div class="row mt-3">
                                         <div class="col-md-12">
                                             <div class="form-group">
-                                                <label><i class="fas fa-camera mr-1"></i> Package Image <span
+                                                <label><i class="fas fa-photo-video mr-1"></i> Package Media <span
                                                         class="text-muted">(Optional)</span></label>
-                                                @if($package->image_url)
-                                                <div id="currentImageContainer" class="mb-3">
-                                                    <div class="position-relative d-inline-block">
-                                                        <img src="{{ $package->image_url }}" alt="Current package image"
-                                                            class="rounded shadow-sm"
-                                                            style="max-width: 250px; max-height: 200px; object-fit: cover;">
-                                                        <span class="badge badge-info position-absolute"
-                                                            style="top: -8px; left: -8px;">Current</span>
+                                                <div class="mb-3">
+                                                    <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                                                        <label
+                                                            class="btn btn-outline-primary {{ !$package->video_url ? 'active' : '' }}"
+                                                            id="mediaTypeImageLabel">
+                                                            <input type="radio" name="media_type" value="image" {{
+                                                                !$package->video_url ? 'checked' : '' }}>
+                                                            <i class="fas fa-camera mr-1"></i> Picture
+                                                        </label>
+                                                        <label
+                                                            class="btn btn-outline-primary {{ $package->video_url ? 'active' : '' }}"
+                                                            id="mediaTypeVideoLabel">
+                                                            <input type="radio" name="media_type" value="video" {{
+                                                                $package->video_url ? 'checked' : '' }}>
+                                                            <i class="fas fa-video mr-1"></i> Video
+                                                        </label>
                                                     </div>
-                                                    <div class="mt-2">
-                                                        <div class="custom-control custom-checkbox">
-                                                            <input type="checkbox" class="custom-control-input"
-                                                                id="removeCurrentImage" name="remove_image" value="1">
-                                                            <label class="custom-control-label text-danger"
-                                                                for="removeCurrentImage">
-                                                                <i class="fas fa-trash-alt mr-1"></i> Remove current
-                                                                image
-                                                            </label>
+                                                </div>
+
+                                                <!-- Image Upload Section -->
+                                                <div id="imageUploadSection"
+                                                    class="{{ $package->video_url ? 'd-none' : '' }}">
+                                                    @if($package->image_url)
+                                                    <div id="currentImageContainer" class="mb-3">
+                                                        <div class="position-relative d-inline-block">
+                                                            <img src="{{ $package->image_url }}"
+                                                                alt="Current package image" class="rounded shadow-sm"
+                                                                style="max-width: 250px; max-height: 200px; object-fit: cover;">
+                                                            <span class="badge badge-info position-absolute"
+                                                                style="top: -8px; left: -8px;">Current</span>
+                                                        </div>
+                                                        <div class="mt-2">
+                                                            <div class="custom-control custom-checkbox">
+                                                                <input type="checkbox" class="custom-control-input"
+                                                                    id="removeCurrentImage" name="remove_image"
+                                                                    value="1">
+                                                                <label class="custom-control-label text-danger"
+                                                                    for="removeCurrentImage">
+                                                                    <i class="fas fa-trash-alt mr-1"></i> Remove current
+                                                                    image
+                                                                </label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    @endif
+                                                    <div class="custom-file">
+                                                        <input type="file" class="custom-file-input" id="packageImage"
+                                                            name="package_image"
+                                                            accept="image/jpeg,image/png,image/jpg,image/gif">
+                                                        <label class="custom-file-label" for="packageImage">{{
+                                                            $package->image_url ? 'Replace image...' : 'Choose image...'
+                                                            }}</label>
+                                                    </div>
+                                                    <small class="text-muted">Max 2MB. Formats: JPEG, PNG, JPG,
+                                                        GIF</small>
+                                                    <div id="imagePreviewContainer" class="mt-3 d-none">
+                                                        <div class="position-relative d-inline-block">
+                                                            <img id="imagePreview" src="" alt="Preview"
+                                                                class="rounded shadow-sm"
+                                                                style="max-width: 250px; max-height: 200px; object-fit: cover;">
+                                                            <span class="badge badge-success position-absolute"
+                                                                style="top: -8px; left: -8px;">New</span>
+                                                            <button type="button" id="removeImage"
+                                                                class="btn btn-sm btn-danger position-absolute"
+                                                                style="top: -8px; right: -8px; border-radius: 50%; width: 28px; height: 28px; padding: 0; line-height: 28px;">
+                                                                <i class="fas fa-times"></i>
+                                                            </button>
                                                         </div>
                                                     </div>
                                                 </div>
-                                                @endif
-                                                <div class="custom-file">
-                                                    <input type="file" class="custom-file-input" id="packageImage"
-                                                        name="package_image"
-                                                        accept="image/jpeg,image/png,image/jpg,image/gif">
-                                                    <label class="custom-file-label" for="packageImage">{{
-                                                        $package->image_url ? 'Replace image...' : 'Choose image...'
-                                                        }}</label>
-                                                </div>
-                                                <small class="text-muted">Max 2MB. Formats: JPEG, PNG, JPG, GIF</small>
-                                                <div id="imagePreviewContainer" class="mt-3 d-none">
-                                                    <div class="position-relative d-inline-block">
-                                                        <img id="imagePreview" src="" alt="Preview"
-                                                            class="rounded shadow-sm"
-                                                            style="max-width: 250px; max-height: 200px; object-fit: cover;">
-                                                        <span class="badge badge-success position-absolute"
-                                                            style="top: -8px; left: -8px;">New</span>
-                                                        <button type="button" id="removeImage"
-                                                            class="btn btn-sm btn-danger position-absolute"
-                                                            style="top: -8px; right: -8px; border-radius: 50%; width: 28px; height: 28px; padding: 0; line-height: 28px;">
-                                                            <i class="fas fa-times"></i>
-                                                        </button>
+
+                                                <!-- Video Upload Section -->
+                                                <div id="videoUploadSection"
+                                                    class="{{ !$package->video_url ? 'd-none' : '' }}">
+                                                    @if($package->video_url)
+                                                    <div id="currentVideoContainer" class="mb-3">
+                                                        <div class="position-relative d-inline-block">
+                                                            <video controls class="rounded shadow-sm"
+                                                                style="max-width: 350px; max-height: 250px;">
+                                                                <source src="{{ $package->video_url }}"
+                                                                    type="video/mp4">
+                                                                Your browser does not support the video tag.
+                                                            </video>
+                                                            <span class="badge badge-info position-absolute"
+                                                                style="top: -8px; left: -8px;">Current</span>
+                                                        </div>
+                                                        <div class="mt-2">
+                                                            <div class="custom-control custom-checkbox">
+                                                                <input type="checkbox" class="custom-control-input"
+                                                                    id="removeCurrentVideo" name="remove_video"
+                                                                    value="1">
+                                                                <label class="custom-control-label text-danger"
+                                                                    for="removeCurrentVideo">
+                                                                    <i class="fas fa-trash-alt mr-1"></i> Remove current
+                                                                    video
+                                                                </label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    @endif
+                                                    <div class="custom-file">
+                                                        <input type="file" class="custom-file-input" id="packageVideo"
+                                                            name="package_video"
+                                                            accept="video/mp4,video/quicktime,video/x-msvideo,video/x-ms-wmv,video/webm">
+                                                        <label class="custom-file-label" for="packageVideo">{{
+                                                            $package->video_url ? 'Replace video...' : 'Choose video...'
+                                                            }}</label>
+                                                    </div>
+                                                    <small class="text-muted">Max 20MB. Formats: MP4, MOV, AVI, WMV,
+                                                        WEBM</small>
+                                                    <div id="videoPreviewContainer" class="mt-3 d-none">
+                                                        <div class="position-relative d-inline-block">
+                                                            <video id="videoPreview" controls class="rounded shadow-sm"
+                                                                style="max-width: 350px; max-height: 250px;">
+                                                            </video>
+                                                            <span class="badge badge-success position-absolute"
+                                                                style="top: -8px; left: -8px;">New</span>
+                                                            <button type="button" id="removeVideo"
+                                                                class="btn btn-sm btn-danger position-absolute"
+                                                                style="top: -8px; right: -8px; border-radius: 50%; width: 28px; height: 28px; padding: 0; line-height: 28px;">
+                                                                <i class="fas fa-times"></i>
+                                                            </button>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -425,7 +505,8 @@
                                                         Percentage</strong></p>
                                                 <p class="text-muted small mb-0">Auto-calculated from Current Step (25%,
                                                     50%, 75%, 100%). You can override if you need a custom value like
-                                                    <code>60%</code>.</p>
+                                                    <code>60%</code>.
+                                                </p>
                                             </div>
                                             <div class="col-md-6">
                                                 <p class="mb-2"><strong><i class="fas fa-tags mr-1"></i> Step Names &
@@ -1145,6 +1226,28 @@
             }
         });
 
+        // Media type toggle (Image / Video)
+        $('input[name="media_type"]').on('change', function() {
+            const selectedType = $(this).val();
+            if (selectedType === 'image') {
+                $('#imageUploadSection').removeClass('d-none');
+                $('#videoUploadSection').addClass('d-none');
+                // Clear video input when switching to image
+                $('#packageVideo').val('');
+                $('#videoPreviewContainer').addClass('d-none');
+                $('#videoPreview').attr('src', '');
+                $('.custom-file-label[for="packageVideo"]').text('{{ $package->video_url ? "Replace video..." : "Choose video..." }}');
+            } else {
+                $('#videoUploadSection').removeClass('d-none');
+                $('#imageUploadSection').addClass('d-none');
+                // Clear image input when switching to video
+                $('#packageImage').val('');
+                $('#imagePreviewContainer').addClass('d-none');
+                $('#imagePreview').attr('src', '');
+                $('.custom-file-label[for="packageImage"]').text('{{ $package->image_url ? "Replace image..." : "Choose image..." }}');
+            }
+        });
+
         // Package image preview
         $('#packageImage').on('change', function() {
             const file = this.files[0];
@@ -1171,12 +1274,44 @@
             $('.custom-file-label[for="packageImage"]').text('{{ $package->image_url ? "Replace image..." : "Choose image..." }}');
         });
 
-        // If remove current image is checked, hide the current image
+        // Package video preview
+        $('#packageVideo').on('change', function() {
+            const file = this.files[0];
+            if (file) {
+                if (file.size > 20 * 1024 * 1024) {
+                    toastr.error('Video must be smaller than 20MB');
+                    $(this).val('');
+                    return;
+                }
+                const url = URL.createObjectURL(file);
+                $('#videoPreview').attr('src', url);
+                $('#videoPreviewContainer').removeClass('d-none');
+                $(this).next('.custom-file-label').text(file.name);
+            }
+        });
+
+        $('#removeVideo').on('click', function() {
+            $('#packageVideo').val('');
+            $('#videoPreviewContainer').addClass('d-none');
+            $('#videoPreview').attr('src', '');
+            $('.custom-file-label[for="packageVideo"]').text('{{ $package->video_url ? "Replace video..." : "Choose video..." }}');
+        });
+
+        // If remove current image is checked, fade the current image
         $('#removeCurrentImage').on('change', function() {
             if ($(this).is(':checked')) {
                 $('#currentImageContainer img').css('opacity', '0.3');
             } else {
                 $('#currentImageContainer img').css('opacity', '1');
+            }
+        });
+
+        // If remove current video is checked, fade the current video
+        $('#removeCurrentVideo').on('change', function() {
+            if ($(this).is(':checked')) {
+                $('#currentVideoContainer video').css('opacity', '0.3');
+            } else {
+                $('#currentVideoContainer video').css('opacity', '1');
             }
         });
     });

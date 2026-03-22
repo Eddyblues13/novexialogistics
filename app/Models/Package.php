@@ -49,7 +49,9 @@ class Package extends Model
         'step4_date',
         'notes',
         'image_url',
-        'image_public_id'
+        'image_public_id',
+        'video_url',
+        'video_public_id'
     ];
 
 

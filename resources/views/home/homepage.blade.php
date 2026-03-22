@@ -656,7 +656,7 @@
                         class="w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold text-lg">
                         JR</div>
                     <div>
-                        <p class="font-bold text-slate-900">James Rodriguez</p>
+                        <p class="font-bold text-slate-900">Jared Thompson</p>
                         <p class="text-slate-500 text-sm">CEO, TechNova Inc.</p>
                     </div>
                 </div>
@@ -680,7 +680,7 @@
                         class="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 font-bold text-lg">
                         SA</div>
                     <div>
-                        <p class="font-bold text-slate-900">Sarah Anderson</p>
+                        <p class="font-bold text-slate-900">Jordan Harris</p>
                         <p class="text-slate-500 text-sm">Operations Director, GreenLeaf Co.</p>
                     </div>
                 </div>
@@ -704,7 +704,7 @@
                         class="w-12 h-12 rounded-full bg-cyan-100 flex items-center justify-center text-cyan-600 font-bold text-lg">
                         MK</div>
                     <div>
-                        <p class="font-bold text-slate-900">Michael Kwame</p>
+                        <p class="font-bold text-slate-900">Hayden Clark (Logistics Analyst)</p>
                         <p class="text-slate-500 text-sm">Founder, QuickMart Africa</p>
                     </div>
                 </div>

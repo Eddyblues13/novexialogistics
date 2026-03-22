@@ -10,9 +10,14 @@
             <div class="mt-2 mb-4">
                 <div class="d-flex justify-content-between align-items-center">
                     <h1 class="title1 text-dark">Package Details</h1>
-                    <a href="{{ route('admin.packages.index') }}" class="btn btn-secondary">
-                        <i class="fas fa-arrow-left"></i> Back to List
-                    </a>
+                    <div>
+                        <button class="btn btn-info mr-2" id="sendEmailBtn" onclick="sendPackageEmail()">
+                            <i class="fas fa-envelope"></i> Send Email
+                        </button>
+                        <a href="{{ route('admin.packages.index') }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Back to List
+                        </a>
+                    </div>
                 </div>
             </div>
 
@@ -71,6 +76,21 @@
                                                                 style="max-width: 200px; max-height: 150px; object-fit: cover; cursor: pointer;">
                                                         </a>
                                                         <br><small class="text-muted">Click to view full size</small>
+                                                    </td>
+                                                </tr>
+                                                @endif
+                                                @if($package->video_url)
+                                                <tr>
+                                                    <th>Package Video:</th>
+                                                    <td>
+                                                        <video controls class="rounded shadow-sm"
+                                                            style="max-width: 300px; max-height: 200px;">
+                                                            <source src="{{ $package->video_url }}" type="video/mp4">
+                                                            Your browser does not support the video tag.
+                                                        </video>
+                                                        <br><small class="text-muted"><a
+                                                                href="{{ $package->video_url }}" target="_blank">Open in
+                                                                new tab</a></small>
                                                     </td>
                                                 </tr>
                                                 @endif
@@ -374,6 +394,45 @@
 </div>
 
 <script>
+    function sendPackageEmail() {
+        const btn = $('#sendEmailBtn');
+        const originalHtml = btn.html();
+
+        Swal.fire({
+            title: 'Send Email Notification?',
+            html: 'This will send a shipment notification email to:<br><strong>{{ $package->receiver_email ?? $package->sender_email ?? "No email available" }}</strong>',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#17a2b8',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: '<i class="fas fa-paper-plane"></i> Send Email',
+            cancelButtonText: 'Cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status"></span> Sending...');
+
+                $.ajax({
+                    url: '{{ route("admin.packages.send-email", $package->id) }}',
+                    type: 'POST',
+                    data: { _token: '{{ csrf_token() }}' },
+                    success: function(response) {
+                        if (response.status === 'success') {
+                            toastr.success(response.message);
+                        } else {
+                            toastr.error(response.message || 'Failed to send email');
+                        }
+                    },
+                    error: function(xhr) {
+                        toastr.error(xhr.responseJSON?.message || 'Failed to send email');
+                    },
+                    complete: function() {
+                        btn.prop('disabled', false).html(originalHtml);
+                    }
+                });
+            }
+        });
+    }
+
     $(document).ready(function() {
         // Add tracking form submission
         $('#addTrackingForm').on('submit', function(e) {

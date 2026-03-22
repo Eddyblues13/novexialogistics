@@ -46,15 +46,37 @@ class ManagePackageController extends Controller
     }
 
     /**
-     * Delete image from Cloudinary by public_id
+     * Upload video to Cloudinary and return [url, public_id]
      */
-    protected function deleteFromCloudinary(?string $publicId): void
+    protected function uploadVideoToCloudinary($file): array
+    {
+        $result = $this->uploadApi->upload(
+            $file->getRealPath(),
+            [
+                'folder' => 'novexia/packages/videos',
+                'resource_type' => 'video',
+                'transformation' => [
+                    'quality' => 'auto',
+                ]
+            ]
+        );
+
+        return [
+            'video_url' => $result['secure_url'],
+            'video_public_id' => $result['public_id'],
+        ];
+    }
+
+    /**
+     * Delete asset from Cloudinary by public_id
+     */
+    protected function deleteFromCloudinary(?string $publicId, string $resourceType = 'image'): void
     {
         if ($publicId) {
             try {
-                $this->uploadApi->destroy($publicId);
+                $this->uploadApi->destroy($publicId, ['resource_type' => $resourceType]);
             } catch (\Exception $e) {
-                Log::error('Failed to delete Cloudinary image: ' . $e->getMessage());
+                Log::error('Failed to delete Cloudinary asset: ' . $e->getMessage());
             }
         }
     }
@@ -118,7 +140,9 @@ class ManagePackageController extends Controller
             'declared_value' => 'nullable|numeric',
             'total_weight' => 'nullable|numeric',
             'estimated_delivery_date' => 'nullable|date',
+            'media_type' => 'nullable|in:image,video',
             'package_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'package_video' => 'nullable|mimes:mp4,mov,avi,wmv,webm|max:20480',
         ]);
 
         if ($validator->fails()) {
@@ -143,7 +167,13 @@ class ManagePackageController extends Controller
                 $request->merge($imageData);
             }
 
-            $package = Package::create($request->except(['package_image', 'send_notification', 'remove_image']));
+            // Handle video upload to Cloudinary
+            if ($request->hasFile('package_video')) {
+                $videoData = $this->uploadVideoToCloudinary($request->file('package_video'));
+                $request->merge($videoData);
+            }
+
+            $package = Package::create($request->except(['package_image', 'package_video', 'media_type', 'send_notification', 'remove_image', 'remove_video']));
 
             // Create initial tracking location
             TrackingLocation::create([
@@ -219,7 +249,9 @@ class ManagePackageController extends Controller
             'declared_value' => 'nullable|numeric',
             'total_weight' => 'nullable|numeric',
             'estimated_delivery_date' => 'nullable|date',
+            'media_type' => 'nullable|in:image,video',
             'package_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'package_video' => 'nullable|mimes:mp4,mov,avi,wmv,webm|max:20480',
 
             // Add validation for tracking locations array
             'tracking_locations' => 'nullable|array',
@@ -247,7 +279,7 @@ class ManagePackageController extends Controller
             ]);
 
             // Update package details
-            $updateData = $request->except(['tracking_locations', 'package_image', 'remove_image', 'send_notification', '_method', '_token']);
+            $updateData = $request->except(['tracking_locations', 'package_image', 'package_video', 'media_type', 'remove_image', 'remove_video', 'send_notification', '_method', '_token']);
 
             // Handle image removal
             if ($request->has('remove_image') && $request->remove_image) {
@@ -256,12 +288,27 @@ class ManagePackageController extends Controller
                 $updateData['image_public_id'] = null;
             }
 
+            // Handle video removal
+            if ($request->has('remove_video') && $request->remove_video) {
+                $this->deleteFromCloudinary($package->video_public_id, 'video');
+                $updateData['video_url'] = null;
+                $updateData['video_public_id'] = null;
+            }
+
             // Handle new image upload to Cloudinary
             if ($request->hasFile('package_image')) {
                 // Delete old image if it exists
                 $this->deleteFromCloudinary($package->image_public_id);
                 $imageData = $this->uploadToCloudinary($request->file('package_image'));
                 $updateData = array_merge($updateData, $imageData);
+            }
+
+            // Handle new video upload to Cloudinary
+            if ($request->hasFile('package_video')) {
+                // Delete old video if it exists
+                $this->deleteFromCloudinary($package->video_public_id, 'video');
+                $videoData = $this->uploadVideoToCloudinary($request->file('package_video'));
+                $updateData = array_merge($updateData, $videoData);
             }
 
             $package->update($updateData);
@@ -357,11 +404,49 @@ class ManagePackageController extends Controller
         }
     }
 
+    public function sendEmail(Package $package)
+    {
+        try {
+            $package->load('trackingLocations');
+            $recipientEmail = $package->receiver_email ?? $package->sender_email;
+
+            if (!$recipientEmail) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'No recipient email address found for this package.'
+                ], 422);
+            }
+
+            Mail::to($recipientEmail)->send(new ShipmentCreated($package));
+
+            Log::info('Shipment email sent manually by admin', [
+                'email' => $recipientEmail,
+                'tracking' => $package->tracking_number
+            ]);
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Email sent successfully to ' . $recipientEmail
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Failed to send shipment email: ' . $e->getMessage(), [
+                'package_id' => $package->id
+            ]);
+
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to send email: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
     public function destroy(Package $package)
     {
         try {
             // Delete image from Cloudinary
             $this->deleteFromCloudinary($package->image_public_id);
+            // Delete video from Cloudinary
+            $this->deleteFromCloudinary($package->video_public_id, 'video');
 
             $package->trackingLocations()->delete();
             $package->delete();

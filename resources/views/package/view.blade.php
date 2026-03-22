@@ -984,6 +984,26 @@
                 </div>
                 @endif
 
+                <!-- Package Video -->
+                @if($package->video_url)
+                <div class="row">
+                    <div class="col-12 mb-4">
+                        <div class="info-card">
+                            <div class="info-card-header">
+                                <i class="fas fa-video"></i> Package Video
+                            </div>
+                            <div class="info-card-body text-center">
+                                <video controls class="img-fluid rounded shadow-sm"
+                                    style="max-width: 100%; max-height: 450px;">
+                                    <source src="{{ $package->video_url }}" type="video/mp4">
+                                    Your browser does not support the video tag.
+                                </video>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @endif
+
                 <!-- Notes Section -->
                 @if($package->notes)
                 <div class="row">

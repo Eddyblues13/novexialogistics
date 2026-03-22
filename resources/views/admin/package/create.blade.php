@@ -280,30 +280,73 @@
                                         </div>
                                     </div>
 
-                                    <!-- Package Image Upload -->
+                                    <!-- Package Media Upload (Image or Video) -->
                                     <div class="row mt-3">
                                         <div class="col-md-12">
                                             <div class="form-group">
-                                                <label><i class="fas fa-camera mr-1"></i> Package Image <span
+                                                <label><i class="fas fa-photo-video mr-1"></i> Package Media <span
                                                         class="text-muted">(Optional)</span></label>
-                                                <div class="custom-file">
-                                                    <input type="file" class="custom-file-input" id="packageImage"
-                                                        name="package_image"
-                                                        accept="image/jpeg,image/png,image/jpg,image/gif">
-                                                    <label class="custom-file-label" for="packageImage">Choose
-                                                        image...</label>
+                                                <div class="mb-3">
+                                                    <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                                                        <label class="btn btn-outline-primary active"
+                                                            id="mediaTypeImageLabel">
+                                                            <input type="radio" name="media_type" value="image" checked>
+                                                            <i class="fas fa-camera mr-1"></i> Picture
+                                                        </label>
+                                                        <label class="btn btn-outline-primary" id="mediaTypeVideoLabel">
+                                                            <input type="radio" name="media_type" value="video">
+                                                            <i class="fas fa-video mr-1"></i> Video
+                                                        </label>
+                                                    </div>
                                                 </div>
-                                                <small class="text-muted">Max 2MB. Formats: JPEG, PNG, JPG, GIF</small>
-                                                <div id="imagePreviewContainer" class="mt-3 d-none">
-                                                    <div class="position-relative d-inline-block">
-                                                        <img id="imagePreview" src="" alt="Preview"
-                                                            class="rounded shadow-sm"
-                                                            style="max-width: 250px; max-height: 200px; object-fit: cover;">
-                                                        <button type="button" id="removeImage"
-                                                            class="btn btn-sm btn-danger position-absolute"
-                                                            style="top: -8px; right: -8px; border-radius: 50%; width: 28px; height: 28px; padding: 0; line-height: 28px;">
-                                                            <i class="fas fa-times"></i>
-                                                        </button>
+
+                                                <!-- Image Upload -->
+                                                <div id="imageUploadSection">
+                                                    <div class="custom-file">
+                                                        <input type="file" class="custom-file-input" id="packageImage"
+                                                            name="package_image"
+                                                            accept="image/jpeg,image/png,image/jpg,image/gif">
+                                                        <label class="custom-file-label" for="packageImage">Choose
+                                                            image...</label>
+                                                    </div>
+                                                    <small class="text-muted">Max 2MB. Formats: JPEG, PNG, JPG,
+                                                        GIF</small>
+                                                    <div id="imagePreviewContainer" class="mt-3 d-none">
+                                                        <div class="position-relative d-inline-block">
+                                                            <img id="imagePreview" src="" alt="Preview"
+                                                                class="rounded shadow-sm"
+                                                                style="max-width: 250px; max-height: 200px; object-fit: cover;">
+                                                            <button type="button" id="removeImage"
+                                                                class="btn btn-sm btn-danger position-absolute"
+                                                                style="top: -8px; right: -8px; border-radius: 50%; width: 28px; height: 28px; padding: 0; line-height: 28px;">
+                                                                <i class="fas fa-times"></i>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Video Upload -->
+                                                <div id="videoUploadSection" class="d-none">
+                                                    <div class="custom-file">
+                                                        <input type="file" class="custom-file-input" id="packageVideo"
+                                                            name="package_video"
+                                                            accept="video/mp4,video/quicktime,video/x-msvideo,video/x-ms-wmv,video/webm">
+                                                        <label class="custom-file-label" for="packageVideo">Choose
+                                                            video...</label>
+                                                    </div>
+                                                    <small class="text-muted">Max 20MB. Formats: MP4, MOV, AVI, WMV,
+                                                        WEBM</small>
+                                                    <div id="videoPreviewContainer" class="mt-3 d-none">
+                                                        <div class="position-relative d-inline-block">
+                                                            <video id="videoPreview" controls class="rounded shadow-sm"
+                                                                style="max-width: 350px; max-height: 250px;">
+                                                            </video>
+                                                            <button type="button" id="removeVideo"
+                                                                class="btn btn-sm btn-danger position-absolute"
+                                                                style="top: -8px; right: -8px; border-radius: 50%; width: 28px; height: 28px; padding: 0; line-height: 28px;">
+                                                                <i class="fas fa-times"></i>
+                                                            </button>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -391,7 +434,8 @@
                                                         Percentage</strong></p>
                                                 <p class="text-muted small mb-0">Auto-calculated from Current Step (25%,
                                                     50%, 75%, 100%). You can override if you need a custom value like
-                                                    <code>60%</code>.</p>
+                                                    <code>60%</code>.
+                                                </p>
                                             </div>
                                             <div class="col-md-6">
                                                 <p class="mb-2"><strong><i class="fas fa-tags mr-1"></i> Step Names &
@@ -1124,6 +1168,28 @@
             }
         });
 
+        // Media type toggle (Image / Video)
+        $('input[name="media_type"]').on('change', function() {
+            const selectedType = $(this).val();
+            if (selectedType === 'image') {
+                $('#imageUploadSection').removeClass('d-none');
+                $('#videoUploadSection').addClass('d-none');
+                // Clear video input when switching to image
+                $('#packageVideo').val('');
+                $('#videoPreviewContainer').addClass('d-none');
+                $('#videoPreview').attr('src', '');
+                $('.custom-file-label[for="packageVideo"]').text('Choose video...');
+            } else {
+                $('#videoUploadSection').removeClass('d-none');
+                $('#imageUploadSection').addClass('d-none');
+                // Clear image input when switching to video
+                $('#packageImage').val('');
+                $('#imagePreviewContainer').addClass('d-none');
+                $('#imagePreview').attr('src', '');
+                $('.custom-file-label[for="packageImage"]').text('Choose image...');
+            }
+        });
+
         // Package image preview
         $('#packageImage').on('change', function() {
             const file = this.files[0];
@@ -1148,6 +1214,29 @@
             $('#imagePreviewContainer').addClass('d-none');
             $('#imagePreview').attr('src', '');
             $('.custom-file-label[for="packageImage"]').text('Choose image...');
+        });
+
+        // Package video preview
+        $('#packageVideo').on('change', function() {
+            const file = this.files[0];
+            if (file) {
+                if (file.size > 20 * 1024 * 1024) {
+                    toastr.error('Video must be smaller than 20MB');
+                    $(this).val('');
+                    return;
+                }
+                const url = URL.createObjectURL(file);
+                $('#videoPreview').attr('src', url);
+                $('#videoPreviewContainer').removeClass('d-none');
+                $(this).next('.custom-file-label').text(file.name);
+            }
+        });
+
+        $('#removeVideo').on('click', function() {
+            $('#packageVideo').val('');
+            $('#videoPreviewContainer').addClass('d-none');
+            $('#videoPreview').attr('src', '');
+            $('.custom-file-label[for="packageVideo"]').text('Choose video...');
         });
     });
 </script>

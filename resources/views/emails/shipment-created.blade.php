@@ -535,6 +535,31 @@
                     </tr>
                     @endif
 
+                    {{-- ===== PACKAGE VIDEO ===== --}}
+                    @if($package->video_url)
+                    <tr>
+                        <td style="background-color: #ffffff; padding: 0 32px 28px;" class="mobile-padding">
+                            <p
+                                style="margin: 0 0 12px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: #94a3b8;">
+                                🎥 Package Video
+                            </p>
+                            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%"
+                                style="border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden;">
+                                <tr>
+                                    <td align="center" style="padding: 16px;">
+                                        <p style="margin: 0 0 12px; font-size: 14px; color: #64748b;">A video of your
+                                            package is available.</p>
+                                        <a href="{{ $package->video_url }}" target="_blank"
+                                            style="display: inline-block; background-color: #3b82f6; color: #ffffff; text-decoration: none; padding: 10px 24px; border-radius: 8px; font-size: 14px; font-weight: 600;">
+                                            ▶ View Package Video
+                                        </a>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    @endif
+
                     {{-- ===== SECOND CTA ===== --}}
                     <tr>
                         <td style="background-color: #ffffff; padding: 8px 32px 32px; text-align: center; border-radius: 0 0 16px 16px;"
