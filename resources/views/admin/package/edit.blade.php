@@ -286,34 +286,15 @@
                                         </div>
                                     </div>
 
-                                    <!-- Package Media Upload (Image or Video) -->
+                                    <!-- Package Media Upload (Image and/or Video) -->
                                     <div class="row mt-3">
-                                        <div class="col-md-12">
+                                        <div class="col-md-6">
                                             <div class="form-group">
-                                                <label><i class="fas fa-photo-video mr-1"></i> Package Media <span
+                                                <label><i class="fas fa-camera mr-1"></i> Package Image <span
                                                         class="text-muted">(Optional)</span></label>
-                                                <div class="mb-3">
-                                                    <div class="btn-group btn-group-toggle" data-toggle="buttons">
-                                                        <label
-                                                            class="btn btn-outline-primary {{ !$package->video_url ? 'active' : '' }}"
-                                                            id="mediaTypeImageLabel">
-                                                            <input type="radio" name="media_type" value="image" {{
-                                                                !$package->video_url ? 'checked' : '' }}>
-                                                            <i class="fas fa-camera mr-1"></i> Picture
-                                                        </label>
-                                                        <label
-                                                            class="btn btn-outline-primary {{ $package->video_url ? 'active' : '' }}"
-                                                            id="mediaTypeVideoLabel">
-                                                            <input type="radio" name="media_type" value="video" {{
-                                                                $package->video_url ? 'checked' : '' }}>
-                                                            <i class="fas fa-video mr-1"></i> Video
-                                                        </label>
-                                                    </div>
-                                                </div>
 
                                                 <!-- Image Upload Section -->
-                                                <div id="imageUploadSection"
-                                                    class="{{ $package->video_url ? 'd-none' : '' }}">
+                                                <div id="imageUploadSection">
                                                     @if($package->image_url)
                                                     <div id="currentImageContainer" class="mb-3">
                                                         <div class="position-relative d-inline-block">
@@ -362,10 +343,15 @@
                                                         </div>
                                                     </div>
                                                 </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label><i class="fas fa-video mr-1"></i> Package Video <span
+                                                        class="text-muted">(Optional)</span></label>
 
                                                 <!-- Video Upload Section -->
-                                                <div id="videoUploadSection"
-                                                    class="{{ !$package->video_url ? 'd-none' : '' }}">
+                                                <div id="videoUploadSection">
                                                     @if($package->video_url)
                                                     <div id="currentVideoContainer" class="mb-3">
                                                         <div class="position-relative d-inline-block">
@@ -1223,28 +1209,6 @@
         $('input[type="datetime-local"]').each(function() {
             if(!$(this).val()) {
                 $(this).val(new Date().toISOString().slice(0, 16));
-            }
-        });
-
-        // Media type toggle (Image / Video)
-        $('input[name="media_type"]').on('change', function() {
-            const selectedType = $(this).val();
-            if (selectedType === 'image') {
-                $('#imageUploadSection').removeClass('d-none');
-                $('#videoUploadSection').addClass('d-none');
-                // Clear video input when switching to image
-                $('#packageVideo').val('');
-                $('#videoPreviewContainer').addClass('d-none');
-                $('#videoPreview').attr('src', '');
-                $('.custom-file-label[for="packageVideo"]').text('{{ $package->video_url ? "Replace video..." : "Choose video..." }}');
-            } else {
-                $('#videoUploadSection').removeClass('d-none');
-                $('#imageUploadSection').addClass('d-none');
-                // Clear image input when switching to video
-                $('#packageImage').val('');
-                $('#imagePreviewContainer').addClass('d-none');
-                $('#imagePreview').attr('src', '');
-                $('.custom-file-label[for="packageImage"]').text('{{ $package->image_url ? "Replace image..." : "Choose image..." }}');
             }
         });
 

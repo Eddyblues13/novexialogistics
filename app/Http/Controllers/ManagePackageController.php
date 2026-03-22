@@ -141,7 +141,6 @@ class ManagePackageController extends Controller
             'declared_value' => 'nullable|numeric',
             'total_weight' => 'nullable|numeric',
             'estimated_delivery_date' => 'nullable|date',
-            'media_type' => 'nullable|in:image,video',
             'package_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'package_video' => 'nullable|mimes:mp4,mov,avi,wmv,webm|max:20480',
         ]);
@@ -250,7 +249,6 @@ class ManagePackageController extends Controller
             'declared_value' => 'nullable|numeric',
             'total_weight' => 'nullable|numeric',
             'estimated_delivery_date' => 'nullable|date',
-            'media_type' => 'nullable|in:image,video',
             'package_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'package_video' => 'nullable|mimes:mp4,mov,avi,wmv,webm|max:20480',
 

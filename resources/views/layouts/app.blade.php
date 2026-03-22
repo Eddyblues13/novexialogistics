@@ -504,6 +504,11 @@
                             <i data-feather="map-pin" class="h-4 w-4"></i>
                             <span>123 Logistics St, City, State 12345</span>
                         </li>
+                        <li class="flex items-center space-x-2">
+                            <i data-feather="send" class="h-4 w-4"></i>
+                            <a href="https://t.me/NovexiaLogistics" target="_blank"
+                                class="hover:text-indigo-600 transition-colors duration-200">Telegram</a>
+                        </li>
                     </ul>
                 </div>
             </div>
