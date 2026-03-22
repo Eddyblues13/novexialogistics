@@ -3,9 +3,9 @@
 		<center>
 			<table>
 				<tr>
-				
 
-				
+
+
 					<td style="font-size:9pt;text-align:center;">
 						<form id="logout-form" action="{{ route('logout') }}" method="POST">
 							@csrf
@@ -51,12 +51,11 @@
 
 <!-- Sweet Alert -->
 <script src="{{asset('user/account/dash/js/plugin/sweetalert/sweetalert.min.js ')}}"></script>
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <!-- Bootstrap Notify -->
 <script src="{{asset('user/account/dash/js/plugin/bootstrap-notify/bootstrap-notify.min.js ')}}"></script>
 
-<script type="text/javascript"
-	src="https://cdn.datatables.net/v/bs4/dt-1.10.21/af-2.3.5/b-1.6.3/b-flash-1.6.3/b-html5-1.6.3/b-print-1.6.3/r-2.2.5/datatables.min.js')}}">
-</script>
 <script type="text/javascript"
 	src="https://cdn.datatables.net/v/bs4/dt-1.10.21/af-2.3.5/b-1.6.3/b-flash-1.6.3/b-html5-1.6.3/b-print-1.6.3/r-2.2.5/datatables.min.js">
 </script>
