@@ -704,8 +704,8 @@
                         class="w-12 h-12 rounded-full bg-cyan-100 flex items-center justify-center text-cyan-600 font-bold text-lg">
                         MK</div>
                     <div>
-                        <p class="font-bold text-slate-900">Hayden Clark (Logistics Analyst)</p>
-                        <p class="text-slate-500 text-sm">Founder, QuickMart Africa</p>
+                        <p class="font-bold text-slate-900">Hayden Clark</p>
+                        <p class="text-slate-500 text-sm">Logistics Analyst</p>
                     </div>
                 </div>
             </div>

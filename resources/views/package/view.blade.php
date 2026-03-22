@@ -644,7 +644,7 @@
                                 <div class="step-icon mx-auto">
                                     <i class="fas fa-clipboard-check"></i>
                                 </div>
-                                <h6 class="mb-1">Send Out For Delivery</h6>
+                                <h6 class="mb-1">{{ $package->step1_name ?? 'Send Out For Delivery' }}</h6>
                                 <small class="text-muted">
                                     @if($package->step1_date)
                                     {{ $package->step1_date->format('M d, Y') }}
@@ -672,7 +672,7 @@
                                 <div class="step-icon mx-auto">
                                     <i class="fas fa-shipping-fast"></i>
                                 </div>
-                                <h6 class="mb-1">In Transit</h6>
+                                <h6 class="mb-1">{{ $package->step3_name ?? 'In Transit' }}</h6>
                                 <small class="text-muted">
                                     @if($package->step3_date)
                                     {{ $package->step3_date->format('M d, Y') }}
@@ -686,7 +686,7 @@
                                 <div class="step-icon mx-auto">
                                     <i class="fas fa-check-circle"></i>
                                 </div>
-                                <h6 class="mb-1">Close to Arriving Destination</h6>
+                                <h6 class="mb-1">{{ $package->step4_name ?? 'Close to Arriving Destination' }}</h6>
                                 <small class="text-muted">
                                     @if($package->step4_date)
                                     {{ $package->step4_date->format('M d, Y') }}
