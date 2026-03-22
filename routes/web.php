@@ -54,6 +54,7 @@ Route::prefix('admin')->middleware('admin')->group(function () {
     Route::get('/packages/{package}', [App\Http\Controllers\ManagePackageController::class, 'show'])->name('admin.packages.show');
     Route::delete('/packages/{package}', [App\Http\Controllers\ManagePackageController::class, 'destroy'])->name('admin.packages.destroy');
     Route::post('/packages/{package}/send-email', [App\Http\Controllers\ManagePackageController::class, 'sendEmail'])->name('admin.packages.send-email');
+    Route::get('/send-email', [App\Http\Controllers\ManagePackageController::class, 'sendEmailIndex'])->name('admin.packages.send-email.index');
 });
 
 Route::prefix('admin')->middleware(['admin'])->group(function () {

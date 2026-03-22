@@ -404,6 +404,30 @@ class ManagePackageController extends Controller
         }
     }
 
+    public function sendEmailIndex(Request $request)
+    {
+        try {
+            $query = Package::latest();
+
+            if ($request->search) {
+                $search = $request->search;
+                $query->where(function ($q) use ($search) {
+                    $q->where('tracking_number', 'LIKE', "%{$search}%")
+                        ->orWhere('sender_name', 'LIKE', "%{$search}%")
+                        ->orWhere('receiver_name', 'LIKE', "%{$search}%")
+                        ->orWhere('receiver_email', 'LIKE', "%{$search}%");
+                });
+            }
+
+            $packages = $query->paginate(10)->withQueryString();
+
+            return view('admin.package.send-email', compact('packages'));
+        } catch (\Exception $e) {
+            Log::error('Error loading send email page: ' . $e->getMessage());
+            return back()->with('error', 'An error occurred while loading the page.');
+        }
+    }
+
     public function sendEmail(Package $package)
     {
         try {

@@ -179,6 +179,12 @@
                                     <p>Edit Package</p>
                                 </a>
                             </li>
+                            <li class="nav-item">
+                                <a href="{{route('admin.packages.send-email.index')}}">
+                                    <i class="fas fa-envelope" aria-hidden="true"></i>
+                                    <p>Send Email</p>
+                                </a>
+                            </li>
                             {{-- <li class="nav-item">
                                 <a href="{{route('admin.packages.show.index')}}">
                                     <i class="fas fa-cubes " aria-hidden="true"></i>
