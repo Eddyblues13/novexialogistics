@@ -631,6 +631,41 @@
                                 </div>
                         </div>
                         </form>
+
+                        <!-- Upload Progress Modal -->
+                        <div class="modal fade" id="uploadProgressModal" tabindex="-1" role="dialog"
+                            data-backdrop="static" data-keyboard="false" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 420px;">
+                                <div class="modal-content"
+                                    style="border: none; border-radius: 20px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+                                    <div class="modal-body text-center" style="padding: 45px 35px 40px;">
+                                        <div id="uploadIconWrap" style="margin-bottom: 15px;">
+                                            <div
+                                                style="width: 70px; height: 70px; border-radius: 50%; background: linear-gradient(135deg, #e8f0fe, #d2e3fc); display: inline-flex; align-items: center; justify-content: center;">
+                                                <i id="uploadIcon" class="fas fa-cloud-upload-alt"
+                                                    style="font-size: 32px; color: #1572E8; animation: uploadPulse 2s ease-in-out infinite;"></i>
+                                            </div>
+                                        </div>
+                                        <div id="uploadPercentNumber"
+                                            style="font-size: 54px; font-weight: 800; background: linear-gradient(135deg, #1572E8, #49a3ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: 1.1; margin-bottom: 4px; font-family: 'Segoe UI', system-ui, sans-serif;">
+                                            0%</div>
+                                        <p id="uploadProgressText"
+                                            style="font-size: 15px; color: #6c757d; margin-bottom: 24px; font-weight: 500;">
+                                            Uploading your files...</p>
+                                        <div
+                                            style="position: relative; height: 8px; border-radius: 4px; background: #e9ecef; overflow: hidden;">
+                                            <div id="uploadProgressBar" role="progressbar"
+                                                style="width: 0%; height: 100%; border-radius: 4px; transition: width 0.3s ease; background: linear-gradient(90deg, #1572E8, #49a3ff);"
+                                                aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                                        </div>
+                                        <p class="mt-3 mb-0" style="font-size: 12px; color: #adb5bd;"><i
+                                                class="fas fa-lock mr-1"></i> Please do not close or refresh this page
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
             </div>
@@ -770,89 +805,96 @@
             opacity: 0;
         }
     }
+
+    /* Upload progress modal animations */
+    @keyframes uploadPulse {
+
+        0%,
+        100% {
+            transform: translateY(0);
+        }
+
+        50% {
+            transform: translateY(-4px);
+        }
+    }
+
+    @keyframes uploadSpin {
+        from {
+            transform: rotate(0deg);
+        }
+
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    #uploadProgressModal .modal-content {
+        animation: modalSlideIn 0.3s ease-out;
+    }
+
+    @keyframes modalSlideIn {
+        from {
+            transform: scale(0.9);
+            opacity: 0;
+        }
+
+        to {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
 </style>
 
 @include('admin.footer')
 
 <script>
     function jumpToStep(stepNumber) {
-        // Don't do anything if we're already on this step
         const currentStep = $('.form-step:not(.d-none)');
-        if (currentStep.hasClass(`step-${stepNumber}`)) {
-            return;
-        }
+        if (currentStep.hasClass(`step-${stepNumber}`)) return;
 
-        // Get current step number
         const currentStepNumber = parseInt(currentStep.attr('class').match(/step-(\d+)/)[1]);
-
-        // Only allow going forward or one step back when clicking step numbers
-        if (stepNumber < currentStepNumber - 1) {
-            return;
-        }
 
         // Validate current step before proceeding if going forward
         if (stepNumber > currentStepNumber && !validateStep(currentStepNumber)) {
             return;
         }
 
-        // Start fade out animation on current step
-        currentStep.removeClass('fadeIn').addClass('fadeOut');
-        
-        // After animation completes
-        setTimeout(() => {
-            currentStep.addClass('d-none').removeClass('fadeOut');
-            
-            // Show the selected step
-            const nextStep = $(`.step-${stepNumber}`);
-            nextStep.removeClass('d-none').addClass('fadeIn');
-            
-            // Update progress steps
-            updateProgressSteps(stepNumber);
-            
-            // Scroll to top of the form
-            $('html, body').animate({
-                scrollTop: $('.page-inner').offset().top
-            }, 500);
-        }, 500);
+        currentStep.addClass('d-none').removeClass('fadeIn');
+        $(`.form-step.step-${stepNumber}`).removeClass('d-none').addClass('fadeIn');
+        updateProgressSteps(stepNumber);
+
+        $('html, body').animate({ scrollTop: $('.page-inner').offset().top }, 300);
     }
 
     function updateProgressSteps(activeStep) {
-        // Update step indicators
         $('.step').removeClass('active');
         $(`.step[data-step="${activeStep}"]`).addClass('active');
         
-        // Update progress bar
         const progressPercentage = ((activeStep - 1) / 3) * 100;
-        $('.progress-bar').css('width', progressPercentage + '%');
+        $('.steps-progress .progress-bar').css('width', progressPercentage + '%');
         
-        // Enable/disable navigation buttons as needed
-        $('.prev-step').toggle(activeStep > 1);
-        $('.next-step').toggle(activeStep < 4);
-        
-        // Change next button to submit on last step
         if (activeStep === 4) {
             $('.next-step').addClass('d-none');
         } else {
             $('.next-step').removeClass('d-none');
         }
+        $('.prev-step').toggle(activeStep > 1);
     }
 
     function validateStep(stepNumber) {
         let isValid = true;
         
-        // Clear previous errors
         $('.text-danger').text('');
         $('.is-invalid').removeClass('is-invalid');
         $('.input-hint').hide();
         
-        // Step 1 validation
         if (stepNumber === 1) {
             if (!$('input[name="sender_name"]').val().trim()) {
                 $('#sender_name_error').text('Sender name is required');
                 $('input[name="sender_name"]').addClass('is-invalid');
                 isValid = false;
             }
-            
             if (!$('input[name="receiver_name"]').val().trim()) {
                 $('#receiver_name_error').text('Receiver name is required');
                 $('input[name="receiver_name"]').addClass('is-invalid');
@@ -860,23 +902,13 @@
             }
         }
         
-        // Step 2 validation
         if (stepNumber === 2) {
             if (!$('input[name="tracking_number"]').val().trim()) {
                 $('#tracking_number_error').text('Tracking number is required');
                 $('input[name="tracking_number"]').addClass('is-invalid');
                 isValid = false;
             }
-            
-            // Check numeric fields
-            const numericFields = [
-                'item_quantity', 
-                'total_weight', 
-                'box_weight', 
-                'declared_value',
-                'number_of_boxes'
-            ];
-            
+            const numericFields = ['item_quantity', 'total_weight', 'box_weight', 'declared_value', 'number_of_boxes'];
             numericFields.forEach(field => {
                 const value = $(`input[name="${field}"]`).val();
                 if (value && isNaN(value)) {
@@ -888,11 +920,10 @@
         }
         
         if (!isValid) {
-            // Scroll to first error
-            $('html, body').animate({
-                scrollTop: $('.is-invalid:first').offset().top - 100
-            }, 500);
-            
+            const firstErr = $('.is-invalid:first');
+            if (firstErr.length) {
+                $('html, body').animate({ scrollTop: firstErr.offset().top - 100 }, 300);
+            }
             toastr.error('Please correct the highlighted fields');
         }
         
@@ -900,79 +931,37 @@
     }
 
     $(document).ready(function() {
-        // Initialize Toastr
         toastr.options = {
-            "closeButton": true,
-            "progressBar": true,
-            "positionClass": "toast-top-right",
-            "showDuration": "300",
-            "hideDuration": "1000",
-            "timeOut": "5000",
-            "extendedTimeOut": "1000",
-            "showEasing": "swing",
-            "hideEasing": "linear",
-            "showMethod": "fadeIn",
-            "hideMethod": "fadeOut"
+            "closeButton": true, "progressBar": true, "positionClass": "toast-top-right",
+            "showDuration": "300", "hideDuration": "1000", "timeOut": "5000",
+            "showEasing": "swing", "hideEasing": "linear", "showMethod": "fadeIn", "hideMethod": "fadeOut"
         };
 
-        // Initialize navigation buttons
         updateProgressSteps(1);
 
-        // Multi-step form navigation
+        // Step navigation
         $('.next-step').on('click', function() {
             const currentStep = $(this).closest('.form-step');
-            const nextStep = currentStep.next('.form-step');
             const currentStepNumber = parseInt(currentStep.attr('class').match(/step-(\d+)/)[1]);
-            const nextStepNumber = currentStepNumber + 1;
+            if (!validateStep(currentStepNumber)) return;
 
-            // Validate current step before proceeding
-            if (!validateStep(currentStepNumber)) {
-                return;
-            }
-
-            // Start fade out animation
-            currentStep.removeClass('fadeIn').addClass('fadeOut');
-            
-            // After animation completes
-            setTimeout(() => {
-                currentStep.addClass('d-none').removeClass('fadeOut');
-                nextStep.removeClass('d-none').addClass('fadeIn');
-                
-                // Update progress steps
-                updateProgressSteps(nextStepNumber);
-                
-                // Scroll to top of the form
-                $('html, body').animate({
-                    scrollTop: $('.page-inner').offset().top
-                }, 500);
-            }, 500);
+            currentStep.addClass('d-none').removeClass('fadeIn');
+            currentStep.next('.form-step').removeClass('d-none').addClass('fadeIn');
+            updateProgressSteps(currentStepNumber + 1);
+            $('html, body').animate({ scrollTop: $('.page-inner').offset().top }, 300);
         });
 
         $('.prev-step').on('click', function() {
             const currentStep = $(this).closest('.form-step');
-            const prevStep = currentStep.prev('.form-step');
             const currentStepNumber = parseInt(currentStep.attr('class').match(/step-(\d+)/)[1]);
-            const prevStepNumber = currentStepNumber - 1;
 
-            // Start fade out animation
-            currentStep.removeClass('fadeIn').addClass('fadeOut');
-            
-            // After animation completes
-            setTimeout(() => {
-                currentStep.addClass('d-none').removeClass('fadeOut');
-                prevStep.removeClass('d-none').addClass('fadeIn');
-                
-                // Update progress steps
-                updateProgressSteps(prevStepNumber);
-                
-                // Scroll to top of the form
-                $('html, body').animate({
-                    scrollTop: $('.page-inner').offset().top
-                }, 500);
-            }, 500);
+            currentStep.addClass('d-none').removeClass('fadeIn');
+            currentStep.prev('.form-step').removeClass('d-none').addClass('fadeIn');
+            updateProgressSteps(currentStepNumber - 1);
+            $('html, body').animate({ scrollTop: $('.page-inner').offset().top }, 300);
         });
 
-        // Real-time validation for numeric fields
+        // Numeric field validation
         $('input[name="item_quantity"], input[name="total_weight"], input[name="box_weight"], input[name="declared_value"], input[name="number_of_boxes"]').on('input', function() {
             const value = $(this).val();
             if (value && isNaN(value)) {
@@ -984,7 +973,7 @@
             }
         });
 
-        // Add new tracking location
+        // Tracking locations
         let locationCounter = 1;
         $('#addTrackingLocation').on('click', function() {
             const newLocation = `
@@ -993,8 +982,7 @@
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label>Location Name <span class="text-danger">*</span></label>
-                                <input type="text" name="tracking_locations[${locationCounter}][location_name]" 
-                                    class="form-control" required>
+                                <input type="text" name="tracking_locations[${locationCounter}][location_name]" class="form-control" required>
                             </div>
                         </div>
                         <div class="col-md-3">
@@ -1012,8 +1000,7 @@
                         <div class="col-md-3">
                             <div class="form-group">
                                 <label>Arrival Time <span class="text-danger">*</span></label>
-                                <input type="datetime-local" name="tracking_locations[${locationCounter}][arrival_time]" 
-                                    class="form-control" required>
+                                <input type="datetime-local" name="tracking_locations[${locationCounter}][arrival_time]" class="form-control" required>
                                 <div class="input-example">Format: YYYY-MM-DD HH:MM</div>
                             </div>
                         </div>
@@ -1021,30 +1008,19 @@
                             <div class="form-group">
                                 <label>Current</label>
                                 <div class="custom-control custom-switch mt-2">
-                                    <input type="checkbox" class="custom-control-input" 
-                                        id="is_current_${locationCounter}" 
-                                        name="tracking_locations[${locationCounter}][is_current]"
-                                        value="1">
+                                    <input type="checkbox" class="custom-control-input" id="is_current_${locationCounter}" name="tracking_locations[${locationCounter}][is_current]" value="1">
                                     <label class="custom-control-label" for="is_current_${locationCounter}"></label>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <button type="button" class="btn btn-sm btn-danger remove-location">
-                        <i class="fas fa-trash"></i> Remove
-                    </button>
-                </div>
-            `;
-            
+                    <button type="button" class="btn btn-sm btn-danger remove-location"><i class="fas fa-trash"></i> Remove</button>
+                </div>`;
             $('#trackingLocations').append(newLocation);
-            
-            // Set current datetime if not set
             $('input[name^="tracking_locations"][name$="[arrival_time]"]:last').val(new Date().toISOString().slice(0, 16));
-            
             locationCounter++;
         });
 
-        // Remove tracking location
         $(document).on('click', '.remove-location', function() {
             if ($('.tracking-location').length > 1) {
                 $(this).closest('.tracking-location').remove();
@@ -1053,7 +1029,7 @@
             }
         });
 
-        // Form submission handling
+        // Form submission with upload progress
         $('#createPackageForm').on('submit', function(e) {
             e.preventDefault();
 
@@ -1062,119 +1038,142 @@
             const submitText = $('#submitText');
             const submitSpinner = $('#submitSpinner');
 
-            // Show loading state
-            submitText.text('Creating...');
-            submitSpinner.removeClass('d-none');
-            submitBtn.prop('disabled', true);
-
             // Clear previous errors
             $('.text-danger').text('');
             $('.is-invalid').removeClass('is-invalid');
             $('.input-hint').hide();
 
-            // Prepare form data
             const formData = new FormData(this);
+            const hasFile = formData.has('package_image') && $('#packageImage')[0].files.length > 0;
+            const hasVideo = formData.has('package_video') && $('#packageVideo')[0].files.length > 0;
+            const hasMedia = hasFile || hasVideo;
 
-            // Add CSRF token to headers
-            $.ajaxSetup({
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            // Show upload progress modal if uploading media
+            let serverTimer = null;
+            let currentDisplayPercent = 0;
+
+            function updateProgressUI(percent, text) {
+                currentDisplayPercent = percent;
+                $('#uploadPercentNumber').text(Math.round(percent) + '%');
+                $('#uploadProgressBar').css('width', percent + '%').attr('aria-valuenow', Math.round(percent));
+                if (text) $('#uploadProgressText').text(text);
+            }
+
+            if (hasMedia) {
+                updateProgressUI(0, 'Uploading your files...');
+                $('#uploadIcon').attr('class', 'fas fa-cloud-upload-alt').css('animation', 'uploadPulse 2s ease-in-out infinite');
+                $('#uploadProgressModal').modal('show');
+            }
+
+            submitText.text('Creating...');
+            submitSpinner.removeClass('d-none');
+            submitBtn.prop('disabled', true);
+
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', form.attr('action'), true);
+            xhr.setRequestHeader('X-CSRF-TOKEN', $('meta[name="csrf-token"]').attr('content'));
+            xhr.setRequestHeader('Accept', 'application/json');
+
+            // Phase 1: Actual upload tracks 0% → 50%
+            xhr.upload.addEventListener('progress', function(e) {
+                if (e.lengthComputable && hasMedia) {
+                    const rawPercent = (e.loaded / e.total) * 100;
+                    const displayPercent = Math.round(rawPercent * 0.5); // map 0-100 → 0-50
+                    updateProgressUI(displayPercent, 'Uploading your files...');
                 }
             });
 
-            $.ajax({
-                url: form.attr('action'),
-                method: 'POST',
-                data: formData,
-                processData: false,
-                contentType: false,
-                success: function(response) {
-                    if(response.status === 'success') {
+            // Phase 2: When upload finishes, simulate 50% → 95% during server processing
+            xhr.upload.addEventListener('load', function() {
+                if (!hasMedia) return;
+                updateProgressUI(50, 'Processing on server... please wait');
+                $('#uploadIcon').attr('class', 'fas fa-spinner').css('animation', 'uploadSpin 1s linear infinite');
+                let simulated = 50;
+                serverTimer = setInterval(function() {
+                    if (simulated < 95) {
+                        // Slow down as it approaches 95
+                        const increment = Math.max(0.3, (95 - simulated) * 0.04);
+                        simulated = Math.min(95, simulated + increment);
+                        updateProgressUI(simulated, 'Processing on server... please wait');
+                    }
+                }, 500);
+            });
+
+            xhr.onload = function() {
+                if (serverTimer) clearInterval(serverTimer);
+                if (hasMedia) {
+                    updateProgressUI(100, 'Complete!');
+                    $('#uploadIcon').attr('class', 'fas fa-check-circle').css('animation', 'none');
+                }
+                setTimeout(function() { $('#uploadProgressModal').modal('hide'); }, 400);
+
+                if (xhr.status === 200) {
+                    const response = JSON.parse(xhr.responseText);
+                    if (response.status === 'success') {
                         toastr.success(response.message);
-                        
-                        // Redirect after delay
                         setTimeout(() => {
                             window.location.href = response.redirect || "{{ route('admin.packages.index') }}";
                         }, 1500);
                     } else {
                         toastr.error(response.message || 'An error occurred');
                     }
-                },
-                error: function(xhr) {
-                    if(xhr.status === 422) {
-                        const errors = xhr.responseJSON.errors;
-                        
-                        // Display validation errors
-                        for(const field in errors) {
-                            // Handle array fields (like tracking_locations)
-                            if (field.includes('tracking_locations')) {
-                                const matches = field.match(/tracking_locations\.(\d+)\.(\w+)/);
-                                if (matches) {
-                                    const index = matches[1];
-                                    const fieldName = matches[2];
-                                    
-                                    // Find the specific input and show error
-                                    const input = $(`input[name="tracking_locations[${index}][${fieldName}]"]`);
-                                    const select = $(`select[name="tracking_locations[${index}][${fieldName}]"]`);
-                                    
-                                    if (input.length) {
-                                        input.addClass('is-invalid');
-                                        input.after(`<span class="text-danger">${errors[field][0]}</span>`);
-                                    } else if (select.length) {
-                                        select.addClass('is-invalid');
-                                        select.after(`<span class="text-danger">${errors[field][0]}</span>`);
-                                    }
-                                }
-                            } else {
-                                // Handle regular fields
-                                const input = $(`[name="${field}"]`);
-                                if (input.length) {
-                                    input.addClass('is-invalid');
-                                    const errorElement = $(`#${field}_error`);
-                                    if (errorElement.length) {
-                                        errorElement.text(errors[field][0]);
-                                    } else {
-                                        input.after(`<span class="text-danger" id="${field}_error">${errors[field][0]}</span>`);
-                                    }
-                                }
+                } else if (xhr.status === 422) {
+                    const response = JSON.parse(xhr.responseText);
+                    const errors = response.errors;
+                    for (const field in errors) {
+                        if (field.includes('tracking_locations')) {
+                            const matches = field.match(/tracking_locations\.(\d+)\.(\w+)/);
+                            if (matches) {
+                                const input = $(`input[name="tracking_locations[${matches[1]}][${matches[2]}]"]`);
+                                const select = $(`select[name="tracking_locations[${matches[1]}][${matches[2]}]"]`);
+                                if (input.length) { input.addClass('is-invalid'); input.after(`<span class="text-danger">${errors[field][0]}</span>`); }
+                                else if (select.length) { select.addClass('is-invalid'); select.after(`<span class="text-danger">${errors[field][0]}</span>`); }
+                            }
+                        } else {
+                            const input = $(`[name="${field}"]`);
+                            if (input.length) {
+                                input.addClass('is-invalid');
+                                const errorEl = $(`#${field}_error`);
+                                if (errorEl.length) { errorEl.text(errors[field][0]); }
+                                else { input.after(`<span class="text-danger" id="${field}_error">${errors[field][0]}</span>`); }
                             }
                         }
-                        
-                        toastr.error('Please fix the validation errors');
-                    } else {
-                        toastr.error('An error occurred while creating the package');
                     }
-                },
-                complete: function() {
-                    submitText.text('Create Package');
-                    submitSpinner.addClass('d-none');
-                    submitBtn.prop('disabled', false);
+                    toastr.error('Please fix the validation errors');
+                } else {
+                    toastr.error('An error occurred while creating the package');
                 }
-            });
+
+                submitText.text('Create Package');
+                submitSpinner.addClass('d-none');
+                submitBtn.prop('disabled', false);
+            };
+
+            xhr.onerror = function() {
+                if (serverTimer) clearInterval(serverTimer);
+                $('#uploadProgressModal').modal('hide');
+                toastr.error('Network error. Please check your connection and try again.');
+                submitText.text('Create Package');
+                submitSpinner.addClass('d-none');
+                submitBtn.prop('disabled', false);
+            };
+
+            xhr.send(formData);
         });
 
-        // Initialize date pickers
+        // Date init
         $('input[type="date"]').attr('min', new Date().toISOString().split('T')[0]);
         $('input[type="datetime-local"]').each(function() {
-            if(!$(this).val()) {
-                $(this).val(new Date().toISOString().slice(0, 16));
-            }
+            if (!$(this).val()) $(this).val(new Date().toISOString().slice(0, 16));
         });
 
-        // Package image preview
+        // Image preview
         $('#packageImage').on('change', function() {
             const file = this.files[0];
             if (file) {
-                if (file.size > 2 * 1024 * 1024) {
-                    toastr.error('Image must be smaller than 2MB');
-                    $(this).val('');
-                    return;
-                }
+                if (file.size > 2 * 1024 * 1024) { toastr.error('Image must be smaller than 2MB'); $(this).val(''); return; }
                 const reader = new FileReader();
-                reader.onload = function(e) {
-                    $('#imagePreview').attr('src', e.target.result);
-                    $('#imagePreviewContainer').removeClass('d-none');
-                };
+                reader.onload = function(e) { $('#imagePreview').attr('src', e.target.result); $('#imagePreviewContainer').removeClass('d-none'); };
                 reader.readAsDataURL(file);
                 $(this).next('.custom-file-label').text(file.name);
             }
@@ -1187,15 +1186,11 @@
             $('.custom-file-label[for="packageImage"]').text('Choose image...');
         });
 
-        // Package video preview
+        // Video preview
         $('#packageVideo').on('change', function() {
             const file = this.files[0];
             if (file) {
-                if (file.size > 20 * 1024 * 1024) {
-                    toastr.error('Video must be smaller than 20MB');
-                    $(this).val('');
-                    return;
-                }
+                if (file.size > 20 * 1024 * 1024) { toastr.error('Video must be smaller than 20MB'); $(this).val(''); return; }
                 const url = URL.createObjectURL(file);
                 $('#videoPreview').attr('src', url);
                 $('#videoPreviewContainer').removeClass('d-none');

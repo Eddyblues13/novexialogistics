@@ -33,7 +33,6 @@
 
 
 <!--   Core JS Files   -->
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
 <script src="{{asset('user/account/dash/js/core/popper.min.js')}}"></script>
 <script src="{{asset('user/account/dash/js/core/bootstrap.min.js')}} "></script>

@@ -6,7 +6,9 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
+use Illuminate\Mail\Mailables\Headers;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Mail\Mailables\Address;
 
 class CustomEmail extends Mailable
 {
@@ -22,6 +24,23 @@ class CustomEmail extends Mailable
     {
         $this->emailSubject = $subject;
         $this->emailBody = $body;
+    }
+
+    /**
+     * Get the message headers.
+     */
+    public function headers(): Headers
+    {
+        return new Headers(
+            replyTo: [
+                new Address(config('mail.from.address'), config('mail.from.name')),
+            ],
+            text: [
+                'X-Mailer' => 'Novexia Logistics Mailer',
+                'Organization' => 'Novexia Logistics',
+                'X-Priority' => '3',
+            ],
+        );
     }
 
     /**
@@ -41,6 +60,7 @@ class CustomEmail extends Mailable
     {
         return new Content(
             view: 'emails.custom',
+            text: 'emails.custom-text',
         );
     }
 
