@@ -8,6 +8,34 @@
 
     <title>@yield('title', 'Novexia Logistics - Global Logistics & Shipping')</title>
 
+    <!-- SEO Meta Tags -->
+    <meta name="description"
+        content="@yield('meta_description', 'Novexia Logistics offers global shipping, air freight, ocean freight, road freight, express delivery, and real-time package tracking to 150+ countries. Get a free quote today.')">
+    <meta name="keywords"
+        content="@yield('meta_keywords', 'logistics, shipping, freight, air freight, ocean freight, road freight, package tracking, international shipping, express delivery, customs clearance, warehousing, global logistics')">
+    <meta name="robots" content="index, follow">
+    <meta name="author" content="Novexia Logistics">
+    <link rel="canonical" href="@yield('canonical', url()->current())">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="@yield('og_type', 'website')">
+    <meta property="og:url" content="{{ url()->current() }}">
+    <meta property="og:title" content="@yield('title', 'Novexia Logistics - Global Logistics & Shipping')">
+    <meta property="og:description"
+        content="@yield('meta_description', 'Novexia Logistics offers global shipping, air freight, ocean freight, road freight, express delivery, and real-time package tracking to 150+ countries.')">
+    <meta property="og:image" content="@yield('og_image', asset('images/hero-picture.jpg'))">
+    <meta property="og:site_name" content="Novexia Logistics">
+    <meta property="og:locale" content="en_US">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="@yield('title', 'Novexia Logistics - Global Logistics & Shipping')">
+    <meta name="twitter:description"
+        content="@yield('meta_description', 'Novexia Logistics offers global shipping, air freight, ocean freight, road freight, express delivery, and real-time package tracking to 150+ countries.')">
+    <meta name="twitter:image" content="@yield('og_image', asset('images/hero-picture.jpg'))">
+
+    @stack('seo')
+
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -713,6 +741,17 @@
     </script>
 
     @stack('scripts')
+
+    <!-- Begin of Chaport Live Chat code -->
+    <script type="text/javascript">
+        (function(w,d,v3){
+    w.chaportConfig = {
+      appId : '69cef60e3d9a0fc13a0c4609',
+    };
+
+    if(w.chaport)return;v3=w.chaport={};v3._q=[];v3._l={};v3.q=function(){v3._q.push(arguments)};v3.on=function(e,fn){if(!v3._l[e])v3._l[e]=[];v3._l[e].push(fn)};var s=d.createElement('script');s.type='text/javascript';s.async=true;s.src='https://app.chaport.com/javascripts/insert.js';var ss=d.getElementsByTagName('script')[0];ss.parentNode.insertBefore(s,ss)})(window, document);
+    </script>
+    <!-- End of Chaport Live Chat code -->
 </body>
 
 </html>

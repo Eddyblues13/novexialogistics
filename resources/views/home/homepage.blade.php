@@ -1,13 +1,169 @@
 @extends('layouts.app')
 
-@section('title', 'Novexia Logistics - Global Logistics & Shipping')
+@section('title', 'Novexia Logistics - Global Logistics, Shipping & Package Tracking')
+@section('meta_description', 'Novexia Logistics provides fast, secure global shipping and logistics services. Air
+freight, ocean freight, road freight, express delivery, warehousing, and real-time package tracking to 150+ countries.
+Get a free quote today.')
+@section('meta_keywords', 'novexia logistics, global shipping, international logistics, air freight, ocean freight, road
+freight, express delivery, package tracking, customs clearance, warehousing, freight forwarding, supply chain, shipping
+company')
+
+@push('seo')
+<!-- JSON-LD Structured Data: Organization -->
+<script type="application/ld+json">
+    {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "Novexia Logistics",
+    "url": "{{ url('/') }}",
+    "logo": "{{ asset('images/hero-picture.jpg') }}",
+    "description": "Global logistics and shipping company offering air freight, ocean freight, road freight, express delivery, and real-time package tracking to 150+ countries.",
+    "email": "info@novexialogistics.com",
+    "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "123 Logistics St",
+        "addressLocality": "City",
+        "addressRegion": "State",
+        "postalCode": "12345"
+    },
+    "sameAs": [],
+    "contactPoint": {
+        "@type": "ContactPoint",
+        "email": "info@novexialogistics.com",
+        "contactType": "customer service",
+        "availableLanguage": ["English"]
+    }
+}
+</script>
+
+<!-- JSON-LD Structured Data: WebSite with SearchAction -->
+<script type="application/ld+json">
+    {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Novexia Logistics",
+    "url": "{{ url('/') }}",
+    "potentialAction": {
+        "@type": "SearchAction",
+        "target": "{{ url('/package') }}?search={tracking_number}",
+        "query-input": "required name=tracking_number"
+    }
+}
+</script>
+
+<!-- JSON-LD Structured Data: Service -->
+<script type="application/ld+json">
+    {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    "serviceType": "Logistics and Shipping",
+    "provider": {
+        "@type": "Organization",
+        "name": "Novexia Logistics"
+    },
+    "areaServed": {
+        "@type": "Place",
+        "name": "Worldwide"
+    },
+    "hasOfferCatalog": {
+        "@type": "OfferCatalog",
+        "name": "Shipping Services",
+        "itemListElement": [
+            {
+                "@type": "Offer",
+                "itemOffered": {
+                    "@type": "Service",
+                    "name": "Air Freight",
+                    "description": "Global air freight delivery in 1-3 days with priority boarding and precise tracking."
+                }
+            },
+            {
+                "@type": "Offer",
+                "itemOffered": {
+                    "@type": "Service",
+                    "name": "Ocean Freight",
+                    "description": "Cost-effective FCL and LCL ocean freight solutions for international supply chains."
+                }
+            },
+            {
+                "@type": "Offer",
+                "itemOffered": {
+                    "@type": "Service",
+                    "name": "Road Freight",
+                    "description": "Reliable domestic and cross-border road transport with full tracking."
+                }
+            },
+            {
+                "@type": "Offer",
+                "itemOffered": {
+                    "@type": "Service",
+                    "name": "Express Delivery",
+                    "description": "Time-sensitive deliveries handled with priority speed and precision."
+                }
+            }
+        ]
+    }
+}
+</script>
+
+<!-- JSON-LD: BreadcrumbList -->
+<script type="application/ld+json">
+    {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+        {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "{{ url('/') }}"
+        }
+    ]
+}
+</script>
+
+<!-- JSON-LD: FAQ -->
+<script type="application/ld+json">
+    {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+        {
+            "@type": "Question",
+            "name": "How do I track my package with Novexia Logistics?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Enter your tracking code (e.g. PRM-123456789) in the tracking widget on our homepage or visit our Track page to get real-time location updates for your shipment."
+            }
+        },
+        {
+            "@type": "Question",
+            "name": "What shipping services does Novexia Logistics offer?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "We offer air freight (1-3 days), ocean freight (15-45 days), road freight (1-7 days), express delivery, last-mile delivery, international shipping to 150+ countries, warehousing, customs clearance, and specialized handling."
+            }
+        },
+        {
+            "@type": "Question",
+            "name": "How many countries does Novexia Logistics ship to?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Novexia Logistics provides shipping services to over 150 countries worldwide with a 99.7% on-time delivery rate."
+            }
+        }
+    ]
+}
+</script>
+@endpush
 
 @section('content')
 <!-- Hero Section with Particles.js -->
-<section class="min-h-[90vh] flex items-center relative overflow-hidden bg-slate-50">
+<header class="min-h-[90vh] flex items-center relative overflow-hidden bg-slate-50" role="banner">
     <!-- Beautiful Hero Image -->
     <div class="absolute inset-0 z-0">
-        <img src="{{ asset('images/hero-picture.jpg') }}" alt="Global Logistics Shipping"
+        <img src="{{ asset('images/hero-picture.jpg') }}"
+            alt="Novexia Logistics - Global logistics and international shipping services with real-time tracking"
             class="w-full h-full object-cover object-center animate-[pulse_20s_ease-in-out_infinite] transform scale-105" />
     </div>
 
@@ -16,7 +172,7 @@
     <div class="absolute inset-0 bg-gradient-to-b from-white/30 via-transparent to-white z-0"></div>
 
     <div class="hero-content container mx-auto px-4 sm:px-6 lg:px-8 relative z-10 py-32 lg:py-0">
-        <div class="max-w-3xl">
+        <div class="max-w-3xl" itemscope itemtype="https://schema.org/WPHeader">
             <div
                 class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white text-indigo-600 font-semibold text-sm mb-6 border border-indigo-100 shadow-sm backdrop-blur-md animate-slide-in">
                 <span class="flex h-2 w-2 rounded-full bg-indigo-500 animate-pulse"></span>
@@ -56,7 +212,7 @@
             </div>
         </div>
     </div>
-</section>
+</header>
 
 <!-- Tracking Widget - Sleek Glassmorphism -->
 <section class="relative z-20 -mt-16 sm:-mt-24 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto">
@@ -432,7 +588,7 @@
             <div
                 class="bg-white rounded-3xl overflow-hidden shadow-lg shadow-slate-200/50 hover:shadow-2xl hover:shadow-indigo-500/10 transition-all duration-500 hover:-translate-y-2 group border border-slate-100 flex flex-col">
                 <div class="h-60 overflow-hidden relative">
-                    <img src="images/air.jpg" alt="Air Freight"
+                    <img src="images/air.jpg" alt="Novexia Logistics Air Freight - Fast global air shipping in 1-3 days"
                         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out">
                     <div class="absolute inset-0 bg-gradient-to-t from-indigo-900/80 via-indigo-900/20 to-transparent">
                     </div>
@@ -465,7 +621,8 @@
             <div
                 class="bg-white rounded-3xl overflow-hidden shadow-lg shadow-slate-200/50 hover:shadow-2xl hover:shadow-indigo-500/10 transition-all duration-500 hover:-translate-y-2 group border border-slate-100 flex flex-col mt-0 md:mt-8 relative">
                 <div class="h-60 overflow-hidden relative">
-                    <img src="images/ocean.jpg" alt="Ocean Freight"
+                    <img src="images/ocean.jpg"
+                        alt="Novexia Logistics Ocean Freight - Cost-effective international sea shipping"
                         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out">
                     <div class="absolute inset-0 bg-gradient-to-t from-indigo-900/80 via-indigo-900/20 to-transparent">
                     </div>
@@ -498,7 +655,8 @@
             <div
                 class="bg-white rounded-3xl overflow-hidden shadow-lg shadow-slate-200/50 hover:shadow-2xl hover:shadow-indigo-500/10 transition-all duration-500 hover:-translate-y-2 group border border-slate-100 flex flex-col">
                 <div class="h-60 overflow-hidden relative">
-                    <img src="images/road.jpg" alt="Road Freight"
+                    <img src="images/road.jpg"
+                        alt="Novexia Logistics Road Freight - Reliable domestic and cross-border transport"
                         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out">
                     <div class="absolute inset-0 bg-gradient-to-t from-indigo-900/80 via-indigo-900/20 to-transparent">
                     </div>
@@ -599,7 +757,8 @@
             <div class="relative">
                 <div class="rounded-3xl overflow-hidden border border-indigo-100 shadow-2xl relative z-10 bg-white">
                     <img src="https://images.unsplash.com/photo-1586528116311-ad8ed7c80a30?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80"
-                        alt="Warehouse Tech" class="w-full h-auto opacity-90">
+                        alt="Novexia Logistics smart warehouse technology and fleet management system"
+                        class="w-full h-auto opacity-90">
                     <div class="absolute inset-0 bg-gradient-to-t from-white to-transparent opacity-80"></div>
 
                     <!-- Tech overlay elements -->
@@ -710,7 +869,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    <div>
 </section>
 
 <!-- Modern CTA Section -->
