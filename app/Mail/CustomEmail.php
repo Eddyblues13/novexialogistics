@@ -32,9 +32,6 @@ class CustomEmail extends Mailable
     public function headers(): Headers
     {
         return new Headers(
-            replyTo: [
-                new Address(config('mail.from.address'), config('mail.from.name')),
-            ],
             text: [
                 'X-Mailer' => 'Novexia Logistics Mailer',
                 'Organization' => 'Novexia Logistics',
@@ -50,6 +47,9 @@ class CustomEmail extends Mailable
     {
         return new Envelope(
             subject: $this->emailSubject,
+            replyTo: [
+                new Address(config('mail.from.address'), config('mail.from.name')),
+            ],
         );
     }
 

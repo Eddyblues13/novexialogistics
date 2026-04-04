@@ -33,9 +33,6 @@ class ShipmentCreated extends Mailable
     public function headers(): Headers
     {
         return new Headers(
-            replyTo: [
-                new Address(config('mail.from.address'), config('mail.from.name')),
-            ],
             text: [
                 'X-Mailer' => 'Novexia Logistics Mailer',
                 'Organization' => 'Novexia Logistics',
@@ -52,6 +49,9 @@ class ShipmentCreated extends Mailable
     {
         return new Envelope(
             subject: 'Shipment Update - Tracking #' . $this->package->tracking_number,
+            replyTo: [
+                new Address(config('mail.from.address'), config('mail.from.name')),
+            ],
         );
     }
 
