@@ -965,39 +965,46 @@
                     </div>
                 </div>
 
-                <!-- Package Image -->
-                @if($package->image_url)
+                <!-- Package Images -->
+                @if(!empty($package->image_url) && count($package->image_url) > 0)
                 <div class="row">
                     <div class="col-12 mb-4">
                         <div class="info-card">
                             <div class="info-card-header">
-                                <i class="fas fa-camera"></i> Package Image
+                                <i class="fas fa-camera"></i> Package Images
                             </div>
                             <div class="info-card-body text-center">
-                                <img src="{{ $package->image_url }}" alt="Package Image"
-                                    class="img-fluid rounded shadow-sm"
-                                    style="max-width: 100%; max-height: 450px; object-fit: contain; cursor: pointer;"
-                                    onclick="window.open(this.src, '_blank');" title="Click to view full size">
+                                <div class="d-flex flex-wrap justify-content-center" style="gap: 15px;">
+                                    @foreach($package->image_url as $imageUrl)
+                                    <img src="{{ $imageUrl }}" alt="Package Image" class="img-fluid rounded shadow-sm"
+                                        style="max-width: 300px; max-height: 350px; object-fit: contain; cursor: pointer;"
+                                        onclick="window.open(this.src, '_blank');" title="Click to view full size">
+                                    @endforeach
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
                 @endif
 
-                <!-- Package Video -->
-                @if($package->video_url)
+                <!-- Package Videos -->
+                @if(!empty($package->video_url) && count($package->video_url) > 0)
                 <div class="row">
                     <div class="col-12 mb-4">
                         <div class="info-card">
                             <div class="info-card-header">
-                                <i class="fas fa-video"></i> Package Video
+                                <i class="fas fa-video"></i> Package Videos
                             </div>
                             <div class="info-card-body text-center">
-                                <video controls class="img-fluid rounded shadow-sm"
-                                    style="max-width: 100%; max-height: 450px;">
-                                    <source src="{{ $package->video_url }}" type="video/mp4">
-                                    Your browser does not support the video tag.
-                                </video>
+                                <div class="d-flex flex-wrap justify-content-center" style="gap: 15px;">
+                                    @foreach($package->video_url as $videoUrl)
+                                    <video controls class="img-fluid rounded shadow-sm"
+                                        style="max-width: 100%; max-height: 400px;">
+                                        <source src="{{ $videoUrl }}" type="video/mp4">
+                                        Your browser does not support the video tag.
+                                    </video>
+                                    @endforeach
+                                </div>
                             </div>
                         </div>
                     </div>

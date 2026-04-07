@@ -141,8 +141,10 @@ class ManagePackageController extends Controller
             'declared_value' => 'nullable|numeric',
             'total_weight' => 'nullable|numeric',
             'estimated_delivery_date' => 'nullable|date',
-            'package_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'package_video' => 'nullable|mimes:mp4,mov,avi,wmv,webm|max:20480',
+            'package_images' => 'nullable|array|max:10',
+            'package_images.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+            'package_videos' => 'nullable|array|max:5',
+            'package_videos.*' => 'mimes:mp4,mov,avi,wmv,webm|max:20480',
         ]);
 
         if ($validator->fails()) {
@@ -161,19 +163,37 @@ class ManagePackageController extends Controller
                 'progress_percentage' => $stepProgressMap[$currentStep] ?? 25,
             ]);
 
-            // Handle image upload to Cloudinary
-            if ($request->hasFile('package_image')) {
-                $imageData = $this->uploadToCloudinary($request->file('package_image'));
-                $request->merge($imageData);
+            // Handle multiple image uploads to Cloudinary
+            $imageUrls = [];
+            $imagePublicIds = [];
+            if ($request->hasFile('package_images')) {
+                foreach ($request->file('package_images') as $imageFile) {
+                    $imageData = $this->uploadToCloudinary($imageFile);
+                    $imageUrls[] = $imageData['image_url'];
+                    $imagePublicIds[] = $imageData['image_public_id'];
+                }
             }
+            $request->merge([
+                'image_url' => $imageUrls,
+                'image_public_id' => $imagePublicIds,
+            ]);
 
-            // Handle video upload to Cloudinary
-            if ($request->hasFile('package_video')) {
-                $videoData = $this->uploadVideoToCloudinary($request->file('package_video'));
-                $request->merge($videoData);
+            // Handle multiple video uploads to Cloudinary
+            $videoUrls = [];
+            $videoPublicIds = [];
+            if ($request->hasFile('package_videos')) {
+                foreach ($request->file('package_videos') as $videoFile) {
+                    $videoData = $this->uploadVideoToCloudinary($videoFile);
+                    $videoUrls[] = $videoData['video_url'];
+                    $videoPublicIds[] = $videoData['video_public_id'];
+                }
             }
+            $request->merge([
+                'video_url' => $videoUrls,
+                'video_public_id' => $videoPublicIds,
+            ]);
 
-            $package = Package::create($request->except(['package_image', 'package_video', 'media_type', 'send_notification', 'remove_image', 'remove_video']));
+            $package = Package::create($request->except(['package_images', 'package_videos', 'media_type', 'send_notification', 'remove_image', 'remove_video']));
 
             // Create initial tracking location
             TrackingLocation::create([
@@ -249,8 +269,10 @@ class ManagePackageController extends Controller
             'declared_value' => 'nullable|numeric',
             'total_weight' => 'nullable|numeric',
             'estimated_delivery_date' => 'nullable|date',
-            'package_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'package_video' => 'nullable|mimes:mp4,mov,avi,wmv,webm|max:20480',
+            'package_images' => 'nullable|array|max:10',
+            'package_images.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+            'package_videos' => 'nullable|array|max:5',
+            'package_videos.*' => 'mimes:mp4,mov,avi,wmv,webm|max:20480',
 
             // Add validation for tracking locations array
             'tracking_locations' => 'nullable|array',
@@ -278,37 +300,61 @@ class ManagePackageController extends Controller
             ]);
 
             // Update package details
-            $updateData = $request->except(['tracking_locations', 'package_image', 'package_video', 'media_type', 'remove_image', 'remove_video', 'send_notification', '_method', '_token']);
+            $updateData = $request->except(['tracking_locations', 'package_images', 'package_videos', 'media_type', 'remove_images', 'remove_videos', 'send_notification', '_method', '_token']);
 
-            // Handle image removal
-            if ($request->has('remove_image') && $request->remove_image) {
-                $this->deleteFromCloudinary($package->image_public_id);
-                $updateData['image_url'] = null;
-                $updateData['image_public_id'] = null;
+            // Current arrays
+            $currentImageUrls = $package->image_url ?? [];
+            $currentImagePublicIds = $package->image_public_id ?? [];
+            $currentVideoUrls = $package->video_url ?? [];
+            $currentVideoPublicIds = $package->video_public_id ?? [];
+
+            // Handle individual image removals
+            if ($request->has('remove_images')) {
+                $removeIndices = array_map('intval', $request->remove_images);
+                foreach ($removeIndices as $idx) {
+                    if (isset($currentImagePublicIds[$idx])) {
+                        $this->deleteFromCloudinary($currentImagePublicIds[$idx]);
+                    }
+                }
+                // Remove the specified indices
+                $currentImageUrls = array_values(array_diff_key($currentImageUrls, array_flip($removeIndices)));
+                $currentImagePublicIds = array_values(array_diff_key($currentImagePublicIds, array_flip($removeIndices)));
             }
 
-            // Handle video removal
-            if ($request->has('remove_video') && $request->remove_video) {
-                $this->deleteFromCloudinary($package->video_public_id, 'video');
-                $updateData['video_url'] = null;
-                $updateData['video_public_id'] = null;
+            // Handle individual video removals
+            if ($request->has('remove_videos')) {
+                $removeIndices = array_map('intval', $request->remove_videos);
+                foreach ($removeIndices as $idx) {
+                    if (isset($currentVideoPublicIds[$idx])) {
+                        $this->deleteFromCloudinary($currentVideoPublicIds[$idx], 'video');
+                    }
+                }
+                $currentVideoUrls = array_values(array_diff_key($currentVideoUrls, array_flip($removeIndices)));
+                $currentVideoPublicIds = array_values(array_diff_key($currentVideoPublicIds, array_flip($removeIndices)));
             }
 
-            // Handle new image upload to Cloudinary
-            if ($request->hasFile('package_image')) {
-                // Delete old image if it exists
-                $this->deleteFromCloudinary($package->image_public_id);
-                $imageData = $this->uploadToCloudinary($request->file('package_image'));
-                $updateData = array_merge($updateData, $imageData);
+            // Handle new image uploads (append to existing)
+            if ($request->hasFile('package_images')) {
+                foreach ($request->file('package_images') as $imageFile) {
+                    $imageData = $this->uploadToCloudinary($imageFile);
+                    $currentImageUrls[] = $imageData['image_url'];
+                    $currentImagePublicIds[] = $imageData['image_public_id'];
+                }
             }
 
-            // Handle new video upload to Cloudinary
-            if ($request->hasFile('package_video')) {
-                // Delete old video if it exists
-                $this->deleteFromCloudinary($package->video_public_id, 'video');
-                $videoData = $this->uploadVideoToCloudinary($request->file('package_video'));
-                $updateData = array_merge($updateData, $videoData);
+            // Handle new video uploads (append to existing)
+            if ($request->hasFile('package_videos')) {
+                foreach ($request->file('package_videos') as $videoFile) {
+                    $videoData = $this->uploadVideoToCloudinary($videoFile);
+                    $currentVideoUrls[] = $videoData['video_url'];
+                    $currentVideoPublicIds[] = $videoData['video_public_id'];
+                }
             }
+
+            $updateData['image_url'] = $currentImageUrls;
+            $updateData['image_public_id'] = $currentImagePublicIds;
+            $updateData['video_url'] = $currentVideoUrls;
+            $updateData['video_public_id'] = $currentVideoPublicIds;
 
             $package->update($updateData);
 
@@ -466,10 +512,14 @@ class ManagePackageController extends Controller
     public function destroy(Package $package)
     {
         try {
-            // Delete image from Cloudinary
-            $this->deleteFromCloudinary($package->image_public_id);
-            // Delete video from Cloudinary
-            $this->deleteFromCloudinary($package->video_public_id, 'video');
+            // Delete all images from Cloudinary
+            foreach (($package->image_public_id ?? []) as $publicId) {
+                $this->deleteFromCloudinary($publicId);
+            }
+            // Delete all videos from Cloudinary
+            foreach (($package->video_public_id ?? []) as $publicId) {
+                $this->deleteFromCloudinary($publicId, 'video');
+            }
 
             $package->trackingLocations()->delete();
             $package->delete();

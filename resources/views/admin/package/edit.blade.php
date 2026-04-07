@@ -286,121 +286,118 @@
                                         </div>
                                     </div>
 
-                                    <!-- Package Media Upload (Image and/or Video) -->
+                                    <!-- Package Media Upload (Multiple Images and/or Videos) -->
                                     <div class="row mt-3">
                                         <div class="col-md-6">
                                             <div class="form-group">
-                                                <label><i class="fas fa-camera mr-1"></i> Package Image <span
-                                                        class="text-muted">(Optional)</span></label>
+                                                <label><i class="fas fa-camera mr-1"></i> Package Images <span
+                                                        class="text-muted">(Optional, up to 10)</span></label>
 
-                                                <!-- Image Upload Section -->
+                                                <!-- Existing Images -->
                                                 <div id="imageUploadSection">
-                                                    @if($package->image_url)
-                                                    <div id="currentImageContainer" class="mb-3">
-                                                        <div class="position-relative d-inline-block">
-                                                            <img src="{{ $package->image_url }}"
-                                                                alt="Current package image" class="rounded shadow-sm"
-                                                                style="max-width: 250px; max-height: 200px; object-fit: cover;">
-                                                            <span class="badge badge-info position-absolute"
-                                                                style="top: -8px; left: -8px;">Current</span>
-                                                        </div>
-                                                        <div class="mt-2">
-                                                            <div class="custom-control custom-checkbox">
-                                                                <input type="checkbox" class="custom-control-input"
-                                                                    id="removeCurrentImage" name="remove_image"
-                                                                    value="1">
-                                                                <label class="custom-control-label text-danger"
-                                                                    for="removeCurrentImage">
-                                                                    <i class="fas fa-trash-alt mr-1"></i> Remove current
-                                                                    image
-                                                                </label>
+                                                    @if(!empty($package->image_url) && count($package->image_url) > 0)
+                                                    <div id="currentImagesContainer" class="mb-3">
+                                                        <p class="text-muted small mb-2">Current images (check to
+                                                            remove):</p>
+                                                        <div class="d-flex flex-wrap" style="gap: 10px;">
+                                                            @foreach($package->image_url as $index => $imageUrl)
+                                                            <div class="position-relative d-inline-block existing-image-item"
+                                                                data-index="{{ $index }}">
+                                                                <img src="{{ $imageUrl }}"
+                                                                    alt="Package image {{ $index + 1 }}"
+                                                                    class="rounded shadow-sm"
+                                                                    style="width: 120px; height: 90px; object-fit: cover;">
+                                                                <span class="badge badge-info position-absolute"
+                                                                    style="top: -8px; left: -8px; font-size: 10px;">{{
+                                                                    $index + 1 }}</span>
+                                                                <div class="mt-1 text-center">
+                                                                    <div class="custom-control custom-checkbox">
+                                                                        <input type="checkbox"
+                                                                            class="custom-control-input remove-image-check"
+                                                                            id="removeImage{{ $index }}"
+                                                                            name="remove_images[]" value="{{ $index }}">
+                                                                        <label
+                                                                            class="custom-control-label text-danger small"
+                                                                            for="removeImage{{ $index }}">
+                                                                            <i class="fas fa-trash-alt"></i>
+                                                                        </label>
+                                                                    </div>
+                                                                </div>
                                                             </div>
+                                                            @endforeach
                                                         </div>
                                                     </div>
                                                     @endif
                                                     <div class="custom-file">
-                                                        <input type="file" class="custom-file-input" id="packageImage"
-                                                            name="package_image"
+                                                        <input type="file" class="custom-file-input" id="packageImages"
+                                                            name="package_images[]" multiple
                                                             accept="image/jpeg,image/png,image/jpg,image/gif">
-                                                        <label class="custom-file-label" for="packageImage">{{
-                                                            $package->image_url ? 'Replace image...' : 'Choose image...'
-                                                            }}</label>
+                                                        <label class="custom-file-label" for="packageImages">Add more
+                                                            images...</label>
                                                     </div>
-                                                    <small class="text-muted">Max 2MB. Formats: JPEG, PNG, JPG,
-                                                        GIF</small>
+                                                    <small class="text-muted">Max 2MB each. Formats: JPEG, PNG, JPG,
+                                                        GIF. New images will be added to existing ones.</small>
                                                     <div id="imagePreviewContainer" class="mt-3 d-none">
-                                                        <div class="position-relative d-inline-block">
-                                                            <img id="imagePreview" src="" alt="Preview"
-                                                                class="rounded shadow-sm"
-                                                                style="max-width: 250px; max-height: 200px; object-fit: cover;">
-                                                            <span class="badge badge-success position-absolute"
-                                                                style="top: -8px; left: -8px;">New</span>
-                                                            <button type="button" id="removeImage"
-                                                                class="btn btn-sm btn-danger position-absolute"
-                                                                style="top: -8px; right: -8px; border-radius: 50%; width: 28px; height: 28px; padding: 0; line-height: 28px;">
-                                                                <i class="fas fa-times"></i>
-                                                            </button>
-                                                        </div>
+                                                        <p class="text-muted small mb-2">New images to add:</p>
+                                                        <div class="d-flex flex-wrap" id="imagePreviews"
+                                                            style="gap: 10px;"></div>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-group">
-                                                <label><i class="fas fa-video mr-1"></i> Package Video <span
-                                                        class="text-muted">(Optional)</span></label>
+                                                <label><i class="fas fa-video mr-1"></i> Package Videos <span
+                                                        class="text-muted">(Optional, up to 5)</span></label>
 
-                                                <!-- Video Upload Section -->
+                                                <!-- Existing Videos -->
                                                 <div id="videoUploadSection">
-                                                    @if($package->video_url)
-                                                    <div id="currentVideoContainer" class="mb-3">
-                                                        <div class="position-relative d-inline-block">
-                                                            <video controls class="rounded shadow-sm"
-                                                                style="max-width: 350px; max-height: 250px;">
-                                                                <source src="{{ $package->video_url }}"
-                                                                    type="video/mp4">
-                                                                Your browser does not support the video tag.
-                                                            </video>
-                                                            <span class="badge badge-info position-absolute"
-                                                                style="top: -8px; left: -8px;">Current</span>
-                                                        </div>
-                                                        <div class="mt-2">
-                                                            <div class="custom-control custom-checkbox">
-                                                                <input type="checkbox" class="custom-control-input"
-                                                                    id="removeCurrentVideo" name="remove_video"
-                                                                    value="1">
-                                                                <label class="custom-control-label text-danger"
-                                                                    for="removeCurrentVideo">
-                                                                    <i class="fas fa-trash-alt mr-1"></i> Remove current
-                                                                    video
-                                                                </label>
+                                                    @if(!empty($package->video_url) && count($package->video_url) > 0)
+                                                    <div id="currentVideosContainer" class="mb-3">
+                                                        <p class="text-muted small mb-2">Current videos (check to
+                                                            remove):</p>
+                                                        <div class="d-flex flex-wrap" style="gap: 10px;">
+                                                            @foreach($package->video_url as $index => $videoUrl)
+                                                            <div class="position-relative d-inline-block existing-video-item"
+                                                                data-index="{{ $index }}">
+                                                                <video controls class="rounded shadow-sm"
+                                                                    style="width: 200px; height: 140px;">
+                                                                    <source src="{{ $videoUrl }}" type="video/mp4">
+                                                                </video>
+                                                                <span class="badge badge-info position-absolute"
+                                                                    style="top: -8px; left: -8px; font-size: 10px;">{{
+                                                                    $index + 1 }}</span>
+                                                                <div class="mt-1 text-center">
+                                                                    <div class="custom-control custom-checkbox">
+                                                                        <input type="checkbox"
+                                                                            class="custom-control-input remove-video-check"
+                                                                            id="removeVideo{{ $index }}"
+                                                                            name="remove_videos[]" value="{{ $index }}">
+                                                                        <label
+                                                                            class="custom-control-label text-danger small"
+                                                                            for="removeVideo{{ $index }}">
+                                                                            <i class="fas fa-trash-alt"></i>
+                                                                        </label>
+                                                                    </div>
+                                                                </div>
                                                             </div>
+                                                            @endforeach
                                                         </div>
                                                     </div>
                                                     @endif
                                                     <div class="custom-file">
-                                                        <input type="file" class="custom-file-input" id="packageVideo"
-                                                            name="package_video"
+                                                        <input type="file" class="custom-file-input" id="packageVideos"
+                                                            name="package_videos[]" multiple
                                                             accept="video/mp4,video/quicktime,video/x-msvideo,video/x-ms-wmv,video/webm">
-                                                        <label class="custom-file-label" for="packageVideo">{{
-                                                            $package->video_url ? 'Replace video...' : 'Choose video...'
-                                                            }}</label>
+                                                        <label class="custom-file-label" for="packageVideos">Add more
+                                                            videos...</label>
                                                     </div>
-                                                    <small class="text-muted">Max 20MB. Formats: MP4, MOV, AVI, WMV,
-                                                        WEBM</small>
+                                                    <small class="text-muted">Max 20MB each. Formats: MP4, MOV, AVI,
+                                                        WMV, WEBM. New videos will be added to existing ones.</small>
                                                     <div id="videoPreviewContainer" class="mt-3 d-none">
-                                                        <div class="position-relative d-inline-block">
-                                                            <video id="videoPreview" controls class="rounded shadow-sm"
-                                                                style="max-width: 350px; max-height: 250px;">
-                                                            </video>
-                                                            <span class="badge badge-success position-absolute"
-                                                                style="top: -8px; left: -8px;">New</span>
-                                                            <button type="button" id="removeVideo"
-                                                                class="btn btn-sm btn-danger position-absolute"
-                                                                style="top: -8px; right: -8px; border-radius: 50%; width: 28px; height: 28px; padding: 0; line-height: 28px;">
-                                                                <i class="fas fa-times"></i>
-                                                            </button>
-                                                        </div>
+                                                        <p class="text-muted small mb-2">New videos to add:</p>
+                                                        <div class="d-flex flex-wrap" id="videoPreviews"
+                                                            style="gap: 10px;"></div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -1120,8 +1117,8 @@
             $('.input-hint').hide();
 
             const formData = new FormData(this);
-            const hasFile = formData.has('package_image') && $('#packageImage')[0].files.length > 0;
-            const hasVideo = formData.has('package_video') && $('#packageVideo')[0].files.length > 0;
+            const hasFile = $('#packageImages')[0] && $('#packageImages')[0].files.length > 0;
+            const hasVideo = $('#packageVideos')[0] && $('#packageVideos')[0].files.length > 0;
             const hasMedia = hasFile || hasVideo;
 
             // Show upload progress modal if uploading media
@@ -1243,50 +1240,105 @@
             if (!$(this).val()) $(this).val(new Date().toISOString().slice(0, 16));
         });
 
-        // Image preview
-        $('#packageImage').on('change', function() {
-            const file = this.files[0];
-            if (file) {
-                if (file.size > 2 * 1024 * 1024) { toastr.error('Image must be smaller than 2MB'); $(this).val(''); return; }
+        // Multiple image preview
+        let selectedImages = new DataTransfer();
+        $('#packageImages').on('change', function() {
+            const files = this.files;
+            if (files.length > 10) { toastr.error('Maximum 10 images allowed'); $(this).val(''); return; }
+            selectedImages = new DataTransfer();
+            $('#imagePreviews').empty();
+            for (let i = 0; i < files.length; i++) {
+                if (files[i].size > 2 * 1024 * 1024) { toastr.error('Each image must be smaller than 2MB'); $(this).val(''); $('#imagePreviewContainer').addClass('d-none'); selectedImages = new DataTransfer(); return; }
+                selectedImages.items.add(files[i]);
                 const reader = new FileReader();
-                reader.onload = function(e) { $('#imagePreview').attr('src', e.target.result); $('#imagePreviewContainer').removeClass('d-none'); };
-                reader.readAsDataURL(file);
-                $(this).next('.custom-file-label').text(file.name);
+                reader.onload = (function(idx) {
+                    return function(e) {
+                        const preview = `<div class="position-relative d-inline-block" data-index="${idx}">
+                            <img src="${e.target.result}" alt="Preview" class="rounded shadow-sm" style="width: 120px; height: 90px; object-fit: cover;">
+                            <span class="badge badge-success position-absolute" style="top: -8px; left: -8px; font-size: 10px;">New</span>
+                            <button type="button" class="btn btn-sm btn-danger position-absolute remove-new-image" data-index="${idx}"
+                                style="top: -8px; right: -8px; border-radius: 50%; width: 24px; height: 24px; padding: 0; line-height: 24px; font-size: 11px;">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>`;
+                        $('#imagePreviews').append(preview);
+                    };
+                })(i);
+                reader.readAsDataURL(files[i]);
+            }
+            $(this).next('.custom-file-label').text(files.length + ' image(s) selected');
+            $('#imagePreviewContainer').removeClass('d-none');
+        });
+
+        $(document).on('click', '.remove-new-image', function() {
+            const idx = $(this).data('index');
+            $(this).closest('.position-relative').remove();
+            const dt = new DataTransfer();
+            for (let i = 0; i < selectedImages.files.length; i++) {
+                if (i !== idx) { dt.items.add(selectedImages.files[i]); }
+            }
+            selectedImages = dt;
+            $('#packageImages')[0].files = selectedImages.files;
+            if (selectedImages.files.length === 0) {
+                $('#imagePreviewContainer').addClass('d-none');
+                $('.custom-file-label[for="packageImages"]').text('Add more images...');
+            } else {
+                $('.custom-file-label[for="packageImages"]').text(selectedImages.files.length + ' image(s) selected');
+                $('#imagePreviews .position-relative').each(function(i) { $(this).attr('data-index', i); $(this).find('.remove-new-image').attr('data-index', i); });
             }
         });
 
-        $('#removeImage').on('click', function() {
-            $('#packageImage').val('');
-            $('#imagePreviewContainer').addClass('d-none');
-            $('#imagePreview').attr('src', '');
-            $('.custom-file-label[for="packageImage"]').text('{{ $package->image_url ? "Replace image..." : "Choose image..." }}');
+        // Multiple video preview
+        let selectedVideos = new DataTransfer();
+        $('#packageVideos').on('change', function() {
+            const files = this.files;
+            if (files.length > 5) { toastr.error('Maximum 5 videos allowed'); $(this).val(''); return; }
+            selectedVideos = new DataTransfer();
+            $('#videoPreviews').empty();
+            for (let i = 0; i < files.length; i++) {
+                if (files[i].size > 20 * 1024 * 1024) { toastr.error('Each video must be smaller than 20MB'); $(this).val(''); $('#videoPreviewContainer').addClass('d-none'); selectedVideos = new DataTransfer(); return; }
+                selectedVideos.items.add(files[i]);
+                const url = URL.createObjectURL(files[i]);
+                const preview = `<div class="position-relative d-inline-block" data-index="${i}">
+                    <video controls class="rounded shadow-sm" style="width: 200px; height: 140px;">
+                        <source src="${url}" type="${files[i].type}">
+                    </video>
+                    <span class="badge badge-success position-absolute" style="top: -8px; left: -8px; font-size: 10px;">New</span>
+                    <button type="button" class="btn btn-sm btn-danger position-absolute remove-new-video" data-index="${i}"
+                        style="top: -8px; right: -8px; border-radius: 50%; width: 24px; height: 24px; padding: 0; line-height: 24px; font-size: 11px;">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>`;
+                $('#videoPreviews').append(preview);
+            }
+            $(this).next('.custom-file-label').text(files.length + ' video(s) selected');
+            $('#videoPreviewContainer').removeClass('d-none');
         });
 
-        // Video preview
-        $('#packageVideo').on('change', function() {
-            const file = this.files[0];
-            if (file) {
-                if (file.size > 20 * 1024 * 1024) { toastr.error('Video must be smaller than 20MB'); $(this).val(''); return; }
-                const url = URL.createObjectURL(file);
-                $('#videoPreview').attr('src', url);
-                $('#videoPreviewContainer').removeClass('d-none');
-                $(this).next('.custom-file-label').text(file.name);
+        $(document).on('click', '.remove-new-video', function() {
+            const idx = $(this).data('index');
+            $(this).closest('.position-relative').remove();
+            const dt = new DataTransfer();
+            for (let i = 0; i < selectedVideos.files.length; i++) {
+                if (i !== idx) { dt.items.add(selectedVideos.files[i]); }
+            }
+            selectedVideos = dt;
+            $('#packageVideos')[0].files = selectedVideos.files;
+            if (selectedVideos.files.length === 0) {
+                $('#videoPreviewContainer').addClass('d-none');
+                $('.custom-file-label[for="packageVideos"]').text('Add more videos...');
+            } else {
+                $('.custom-file-label[for="packageVideos"]').text(selectedVideos.files.length + ' video(s) selected');
+                $('#videoPreviews .position-relative').each(function(i) { $(this).attr('data-index', i); $(this).find('.remove-new-video').attr('data-index', i); });
             }
         });
 
-        $('#removeVideo').on('click', function() {
-            $('#packageVideo').val('');
-            $('#videoPreviewContainer').addClass('d-none');
-            $('#videoPreview').attr('src', '');
-            $('.custom-file-label[for="packageVideo"]').text('{{ $package->video_url ? "Replace video..." : "Choose video..." }}');
+        // Fade existing media when remove checkbox checked
+        $(document).on('change', '.remove-image-check', function() {
+            $(this).closest('.existing-image-item').find('img').css('opacity', $(this).is(':checked') ? '0.3' : '1');
         });
-
-        // Fade current media when remove checkbox checked
-        $('#removeCurrentImage').on('change', function() {
-            $('#currentImageContainer img').css('opacity', $(this).is(':checked') ? '0.3' : '1');
-        });
-        $('#removeCurrentVideo').on('change', function() {
-            $('#currentVideoContainer video').css('opacity', $(this).is(':checked') ? '0.3' : '1');
+        $(document).on('change', '.remove-video-check', function() {
+            $(this).closest('.existing-video-item').find('video').css('opacity', $(this).is(':checked') ? '0.3' : '1');
         });
     });
 </script>

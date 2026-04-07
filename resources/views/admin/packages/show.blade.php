@@ -66,31 +66,41 @@
                                                     <th>Notes:</th>
                                                     <td>{{ $package->notes ?? 'N/A' }}</td>
                                                 </tr>
-                                                @if($package->image_url)
+                                                @if(!empty($package->image_url) && count($package->image_url) > 0)
                                                 <tr>
-                                                    <th>Package Image:</th>
+                                                    <th>Package Images:</th>
                                                     <td>
-                                                        <a href="{{ $package->image_url }}" target="_blank">
-                                                            <img src="{{ $package->image_url }}" alt="Package Image"
-                                                                class="img-fluid rounded shadow-sm"
-                                                                style="max-width: 200px; max-height: 150px; object-fit: cover; cursor: pointer;">
-                                                        </a>
+                                                        <div class="d-flex flex-wrap" style="gap: 10px;">
+                                                            @foreach($package->image_url as $imageUrl)
+                                                            <a href="{{ $imageUrl }}" target="_blank">
+                                                                <img src="{{ $imageUrl }}" alt="Package Image"
+                                                                    class="img-fluid rounded shadow-sm"
+                                                                    style="max-width: 150px; max-height: 120px; object-fit: cover; cursor: pointer;">
+                                                            </a>
+                                                            @endforeach
+                                                        </div>
                                                         <br><small class="text-muted">Click to view full size</small>
                                                     </td>
                                                 </tr>
                                                 @endif
-                                                @if($package->video_url)
+                                                @if(!empty($package->video_url) && count($package->video_url) > 0)
                                                 <tr>
-                                                    <th>Package Video:</th>
+                                                    <th>Package Videos:</th>
                                                     <td>
-                                                        <video controls class="rounded shadow-sm"
-                                                            style="max-width: 300px; max-height: 200px;">
-                                                            <source src="{{ $package->video_url }}" type="video/mp4">
-                                                            Your browser does not support the video tag.
-                                                        </video>
-                                                        <br><small class="text-muted"><a
-                                                                href="{{ $package->video_url }}" target="_blank">Open in
-                                                                new tab</a></small>
+                                                        <div class="d-flex flex-wrap" style="gap: 10px;">
+                                                            @foreach($package->video_url as $videoUrl)
+                                                            <div>
+                                                                <video controls class="rounded shadow-sm"
+                                                                    style="max-width: 250px; max-height: 180px;">
+                                                                    <source src="{{ $videoUrl }}" type="video/mp4">
+                                                                    Your browser does not support the video tag.
+                                                                </video>
+                                                                <br><small class="text-muted"><a href="{{ $videoUrl }}"
+                                                                        target="_blank">Open in
+                                                                        new tab</a></small>
+                                                            </div>
+                                                            @endforeach
+                                                        </div>
                                                     </td>
                                                 </tr>
                                                 @endif
